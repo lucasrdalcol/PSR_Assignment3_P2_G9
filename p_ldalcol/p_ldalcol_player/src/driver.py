@@ -22,13 +22,24 @@ from sensor_msgs.msg import Image
 class Driver:
     def __init__(self):
         # Define all variables
+        self.biggest_area_green = None
+        self.biggest_centroid_blue = None
+        self.biggest_area_blue = None
+        self.biggest_area_red = None
+        self.biggest_centroid_red = None
+        self.teams = None
+        self.biggest_centroid_green = None
         self.name = rospy.get_name()
         self.name = self.name.strip('/')  # remove initial /
         self.goal = PoseStamped()
         self.goal_active = False
-        self.prey_active = False
+        self.blue_prey_active = False
+        self.red_prey_active = False
+        self.green_prey_active = False
         self.angle = 0
         self.speed = 0
+        self.image_center = 427
+        self.debug = rospy.get_param('/debug')
 
         # Initialize publisher
         self.publisher_command = rospy.Publisher('/' + self.name + '/cmd_vel', Twist, queue_size=1)
@@ -46,6 +57,7 @@ class Driver:
 
         # Which is my team
         self.configureMyTeam(self.name)
+        self.my_prey_color = self.teams['my_preys'].split('_')[0]
 
         # Initialize the color segmentation
         self.bridge = CvBridge()
@@ -119,38 +131,56 @@ class Driver:
         # conversion from numpy from uint8 to bool
         mask_blue = mask_blue.astype(bool)
 
-        # Paint largest blobs
-        rgb_image_processed = copy.deepcopy(rgb_image_original)
-        rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_red, color='red')
-        rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_green, color='green')
-        rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_blue, color='blue')
-
         # Find centroids of the largest blobs of each mask
-        centroid_red, area_red = self.findCentroid(mask_red.astype(np.uint8) * 255)
-        centroid_green, area_green = self.findCentroid(mask_green.astype(np.uint8) * 255)
-        centroid_blue, area_blue = self.findCentroid(mask_blue.astype(np.uint8) * 255)
+        self.biggest_centroid_red, self.biggest_area_red = self.findCentroid(mask_red.astype(np.uint8) * 255)
+        self.biggest_centroid_green, self.biggest_area_green = self.findCentroid(mask_green.astype(np.uint8) * 255)
+        self.biggest_centroid_blue, self.biggest_area_blue = self.findCentroid(mask_blue.astype(np.uint8) * 255)
+
+        if self.debug is True:
+            # Paint largest blobs
+            rgb_image_processed = copy.deepcopy(rgb_image_original)
+            rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_red, color='red')
+            rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_green, color='green')
+            rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_blue, color='blue')
 
         # Annotate the closest players of my_team, my_preys and my_hunters
-        if not centroid_red is None:
-            rgb_image_processed = cv2.circle(rgb_image_processed, (round(centroid_red[0]), round(centroid_red[1])),
-                                             8, (0, 0, 0), -1)
-        if not centroid_green is None:
-            rgb_image_processed = cv2.circle(rgb_image_processed, (round(centroid_green[0]), round(centroid_green[1])),
-                                             8, (0, 0, 0), -1)
-            if self.name in self.teams['red_team']:
-                self.prey_active = True
+        if self.biggest_centroid_red is not None:
+            if self.debug is True:
+                rgb_image_processed = cv2.circle(rgb_image_processed,
+                                                 (round(self.biggest_centroid_red[0]), round(self.biggest_centroid_red[1])),
+                                                 8, (0, 0, 0), -1)
+            if self.name in self.teams['blue_team']:
+                self.red_prey_active = True
         else:
-            self.prey_active = False
-        if not centroid_blue is None:
-            rgb_image_processed = cv2.circle(rgb_image_processed, (round(centroid_blue[0]), round(centroid_blue[1])),
-                                             8, (0, 0, 0), -1)
+            self.red_prey_active = False
 
-        cv2.imshow('Original image', rgb_image_original)  # Display the image
-        cv2.imshow('Processed image', rgb_image_processed)  # Display the image
-        cv2.imshow('Red players mask', mask_red.astype(np.uint8) * 255)  # Display the segmented image
-        cv2.imshow('Green players mask', mask_green.astype(np.uint8) * 255)  # Display the segmented image
-        cv2.imshow('Blue players mask', mask_blue.astype(np.uint8) * 255)  # Display the segmented image
-        cv2.waitKey(1)
+        if self.biggest_centroid_green is not None:
+            if self.debug is True:
+                rgb_image_processed = cv2.circle(rgb_image_processed,
+                                                 (round(self.biggest_centroid_green[0]), round(self.biggest_centroid_green[1])),
+                                                 8, (0, 0, 0), -1)
+            if self.name in self.teams['red_team']:
+                self.green_prey_active = True
+        else:
+            self.green_prey_active = False
+
+        if self.biggest_centroid_blue is not None:
+            if self.debug is True:
+                rgb_image_processed = cv2.circle(rgb_image_processed,
+                                                 (round(self.biggest_centroid_blue[0]), round(self.biggest_centroid_blue[1])),
+                                                 8, (0, 0, 0), -1)
+            if self.name in self.teams['green_team']:
+                self.blue_prey_active = True
+        else:
+            self.blue_prey_active = False
+
+        if self.debug is True:
+            cv2.imshow('Original image', rgb_image_original)  # Display the image
+            cv2.imshow('Processed image', rgb_image_processed)  # Display the image
+            cv2.imshow('Red players mask', mask_red.astype(np.uint8) * 255)  # Display the segmented image
+            cv2.imshow('Green players mask', mask_green.astype(np.uint8) * 255)  # Display the segmented image
+            cv2.imshow('Blue players mask', mask_blue.astype(np.uint8) * 255)  # Display the segmented image
+            cv2.waitKey(1)
 
     def findCentroid(self, mask_original):
         """
@@ -274,16 +304,30 @@ class Driver:
         # Check if the goal pose is active or not
         if not self.goal_active:  # No goal, no movement
             self.speed = 0
-            self.angle = 0.5
+            self.angle = 0
         else:
             self.driveStraight()
 
-        # Check if the goal pose is active or not
-        if not self.prey_active:  # No prey, rotate along its axis to find a prey
-            self.speed = 0
-            self.angle = 0.5
-        else:
-            self.pursuePrey()
+        if self.my_prey_color == 'red':
+            if not self.red_prey_active:  # No prey, rotate along its axis to find a prey
+                self.speed = 0
+                self.angle = 0.5
+            else:
+                self.pursuePrey(self.my_prey_color)
+
+        elif self.my_prey_color == 'green':
+            if not self.green_prey_active:  # No prey, rotate along its axis to find a prey
+                self.speed = 0
+                self.angle = 0.5
+            else:
+                self.pursuePrey(self.my_prey_color)
+
+        elif self.my_prey_color == 'blue':
+            if not self.blue_prey_active:  # No prey, rotate along its axis to find a prey
+                self.speed = 0
+                self.angle = 0.5
+            else:
+                self.pursuePrey(self.my_prey_color)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
@@ -323,17 +367,41 @@ class Driver:
             self.goal_active = False
             rospy.loginfo('Robot achieved its goal.')
 
-    def pursuePrey(self, minimum_speed=0.1, maximum_speed=0.75):
+    def pursuePrey(self, my_prey_color, maximum_speed=0.75):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param minimum_speed: minimum speed allowed to the robot when driving to the goal pose.
         :param maximum_speed: maximum speed allowed to the robot when driving to the goal pose.
         """
 
-        my_prey_color = self.teams['my_preys'][0][:-1]
-        print(my_prey_color)
+        if my_prey_color == 'red':
+            distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
+            if distance_to_center > 0:  # turn right
+                self.angle = -0.5
+            elif distance_to_center < 0:  # turn left
+                self.angle = 0.5
+            else:  # go straight away to the prey
+                self.angle = 0
 
-        centroid_copy = copy.deepcopy(self.goal)
+        elif my_prey_color == 'green':
+            distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
+            if distance_to_center > 0:  # turn right
+                self.angle = -0.5
+            elif distance_to_center < 0:  # turn left
+                self.angle = 0.5
+            else:  # go straight away to the prey
+                self.angle = 0
+
+        elif my_prey_color == 'blue':
+            distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
+            if distance_to_center > 0:  # turn right
+                self.angle = -0.5
+            elif distance_to_center < 0:  # turn left
+                self.angle = 0.5
+            else:  # go straight away to the prey
+                self.angle = 0
+
+        self.speed = maximum_speed
 
 
 def publisher():
