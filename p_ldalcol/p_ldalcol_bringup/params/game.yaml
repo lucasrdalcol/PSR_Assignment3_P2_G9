@@ -1,0 +1,11 @@
+red_players: ["red1", "red2", "red3"]
+green_players: ["green1", "green2", "green3"]
+blue_players: ["blue1", "blue2", "blue3"]
+
+game_duration: 80
+immunity_duration: 3
+killed_duration: 6
+positive_score: 1
+negative_score: -1
+best_hunter_score: 5
+best_survivor_score: 5
