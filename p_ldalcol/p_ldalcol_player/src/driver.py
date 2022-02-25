@@ -81,11 +81,12 @@ class Driver:
         # Which is my team
         self.configureMyTeam(self.name)
         self.my_prey_color = self.teams['my_preys'].split('_')[0]
+        self.my_hunter_color = self.teams['my_hunters'].split('_')[0]
 
-        # Initialize the color segmentation
+        # Initialize the detection of the robots through computer vision
         self.bridge = CvBridge()
         self.image_subscriber = rospy.Subscriber('/' + self.name + '/camera/rgb/image_raw', Image,
-                                                 self.configureColorSegmentationCallback)
+                                                 self.detectRobotsWithVisionCallback)
 
     def configureMyTeam(self, player_name):
         self.teams = {'red_team': rospy.get_param('/red_players'),
@@ -111,7 +112,7 @@ class Driver:
         else:
             raise rospy.logerr('The player name' + self.name + ' does not fit in any team.')
 
-    def configureColorSegmentationCallback(self, image_msg):
+    def detectRobotsWithVisionCallback(self, image_msg):
         # Convert the from imgmsg ROS to opencv.
         try:
             rgb_image_original = self.bridge.imgmsg_to_cv2(image_msg, desired_encoding="bgr8")
@@ -141,22 +142,73 @@ class Driver:
         self.biggest_centroid_green, self.biggest_area_green = self.findCentroid(mask_green.astype(np.uint8) * 255)
         self.biggest_centroid_blue, self.biggest_area_blue = self.findCentroid(mask_blue.astype(np.uint8) * 255)
 
-        # Annotate the closest players of my_team, my_preys and my_hunters
+        # Decide state mode
         if self.name in self.teams['red_team']:
-            if self.biggest_centroid_green is not None:
-                self.state = 'hunting'
+            # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
+            if self.biggest_centroid_green is not None and self.biggest_centroid_blue is not None:
+                # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
+                # the closest the prey or the hunter are.
+                if self.biggest_area_green > self.biggest_area_blue:
+                    self.state = 'hunting'
+                else:
+                    self.state = 'escaping'
+
+            # Check if there is only hunter or prey detected.
+            elif self.biggest_centroid_green is not None or self.biggest_centroid_blue is not None:
+                # Activate hunting mode
+                if self.biggest_centroid_green is not None:
+                    self.state = 'hunting'
+                # Activate escape mode
+                elif self.biggest_centroid_blue is not None:
+                    self.state = 'escaping'
+
+            # If there is no hunter or prey detected, active waiting mode.
             else:
                 self.state = 'waiting'
 
         if self.name in self.teams['green_team']:
-            if self.biggest_centroid_blue is not None:
-                self.state = 'hunting'
+            # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
+            if self.biggest_centroid_blue is not None and self.biggest_centroid_red is not None:
+                # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
+                # the closest the prey or the hunter are.
+                if self.biggest_area_blue > self.biggest_area_red:
+                    self.state = 'hunting'
+                else:
+                    self.state = 'escaping'
+
+            # Check if there is only hunter or prey detected.
+            elif self.biggest_centroid_blue is not None or self.biggest_centroid_red is not None:
+                # Activate hunting mode
+                if self.biggest_centroid_blue is not None:
+                    self.state = 'hunting'
+                # Activate escape mode
+                elif self.biggest_centroid_red is not None:
+                    self.state = 'escaping'
+
+            # If there is no hunter or prey detected, active waiting mode.
             else:
                 self.state = 'waiting'
 
         if self.name in self.teams['blue_team']:
-            if self.biggest_centroid_red is not None:
-                self.state = 'hunting'
+            # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
+            if self.biggest_centroid_red is not None and self.biggest_centroid_green is not None:
+                # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
+                # the closest the prey or the hunter are.
+                if self.biggest_area_red > self.biggest_area_green:
+                    self.state = 'hunting'
+                else:
+                    self.state = 'escaping'
+
+            # Check if there is only hunter or prey detected.
+            elif self.biggest_centroid_red is not None or self.biggest_centroid_green is not None:
+                # Activate hunting mode
+                if self.biggest_centroid_red is not None:
+                    self.state = 'hunting'
+                # Activate escape mode
+                elif self.biggest_centroid_green is not None:
+                    self.state = 'escaping'
+
+            # If there is no hunter or prey detected, active waiting mode.
             else:
                 self.state = 'waiting'
 
@@ -328,10 +380,16 @@ class Driver:
 
                 # if self.debug:
                 print(Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+
             elif self.state == 'hunting':
                 self.pursuePrey(self.my_prey_color)
                 # if self.debug:
                 print(Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
+
+            elif self.state == 'escaping':
+                self.escapeHunter(self.my_hunter_color)
+                # if self.debug:
+                print(Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
@@ -340,6 +398,10 @@ class Driver:
 
         # Publish the twist command to the robot
         self.publisher_command.publish(twist)
+
+        # # If there is a hunter, escape from him for 2 seconds to maintain the speed and angle commands.
+        # if self.state == 'escaping':
+        #     rospy.sleep(5)
 
     def driveStraight(self, minimum_speed=0.1, maximum_speed=0.75):
         """
@@ -374,6 +436,7 @@ class Driver:
     def pursuePrey(self, my_prey_color, minimum_speed=0.3, maximum_speed=0.9):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
+        :param my_prey_color:
         :param minimum_speed: minimum speed allowed to the robot when driving to the goal pose.
         :param maximum_speed: maximum speed allowed to the robot when driving to the goal pose.
         """
@@ -417,33 +480,37 @@ class Driver:
                 else:  # go straight away to the prey
                     self.angle = 0
 
-    def escapeHunter(self, my_hunter_color, maximum_speed=0.5):
+    def escapeHunter(self, my_hunter_color, minimum_speed=0.3, maximum_speed=0.6):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
+        :param minimum_speed:
         :param my_hunter_color:
         :param maximum_speed: maximum speed allowed to the robot when driving to the goal pose.
         """
 
         if my_hunter_color == 'red':
-            self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
-            if self.distance_to_center > 0:  # turn left, to the opposite direction
-                self.angle = 0.75
-            elif self.distance_to_center < 0:  # turn right, to the opposite direction
-                self.angle = -0.75
+            if self.biggest_centroid_red is not None:
+                self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
+                if self.distance_to_center > 0:  # turn left, to the opposite direction
+                    self.angle = 0.6
+                elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                    self.angle = -0.6
 
         elif my_hunter_color == 'green':
-            self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
-            if self.distance_to_center > 0:  # turn left, to the opposite direction
-                self.angle = 0.75
-            elif self.distance_to_center < 0:  # turn right, to the opposite direction
-                self.angle = -0.75
+            if self.biggest_centroid_green is not None:
+                self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
+                if self.distance_to_center > 0:  # turn left, to the opposite direction
+                    self.angle = 0.6
+                elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                    self.angle = -0.6
 
         elif my_hunter_color == 'blue':
-            self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
-            if self.distance_to_center > 0:  # turn left, to the opposite direction
-                self.angle = 0.75
-            elif self.distance_to_center < 0:  # turn right, to the opposite direction
-                self.angle = -0.75
+            if self.biggest_centroid_blue is not None:
+                self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
+                if self.distance_to_center > 0:  # turn left, to the opposite direction
+                    self.angle = 0.6
+                elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                    self.angle = -0.6
 
         self.speed = maximum_speed
 
