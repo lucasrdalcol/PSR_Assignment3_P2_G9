@@ -88,6 +88,10 @@ class Driver:
         self.image_subscriber = rospy.Subscriber('/' + self.name + '/camera/rgb/image_raw', Image,
                                                  self.detectRobotsWithVisionCallback)
 
+        # # Initialize the detection of the LiDAR 2D
+        # self.lidar_subscriber = rospy.Subscriber('/' + self.name + '/camera/rgb/image_raw', Image,
+        #                                          self.detectRobotsWithVisionCallback)
+
     def configureMyTeam(self, player_name):
         self.teams = {'red_team': rospy.get_param('/red_players'),
                       'green_team': rospy.get_param('/green_players'),
@@ -362,34 +366,31 @@ class Driver:
         # print('Sending twist command')
 
         # Check if the goal pose is active or not
-        if not self.goal_active:  # No goal, no movement
-            self.speed = 0
-            self.angle = 0
-        else:
+        if self.goal_active:  # No goal, no movement
             self.driveStraight()
+        else:
+            if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams['blue_team']:
+                # If there is a prey detected, pursue prey
+                if self.state == 'waiting':
+                    if self.distance_to_center >= 0:
+                        self.speed = 0
+                        self.angle = -0.5  # rotate to right
+                    else:
+                        self.speed = 0
+                        self.angle = 0.5  # rotate to left
 
-        if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams['blue_team']:
-            # If there is a prey detected, pursue prey
-            if self.state == 'waiting':
-                if self.distance_to_center >= 0:
-                    self.speed = 0
-                    self.angle = -0.5  # rotate to right
-                else:
-                    self.speed = 0
-                    self.angle = 0.5  # rotate to left
+                    # if self.debug:
+                    print(Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
 
-                # if self.debug:
-                print(Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+                elif self.state == 'hunting':
+                    self.pursuePrey(self.my_prey_color)
+                    # if self.debug:
+                    print(Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
 
-            elif self.state == 'hunting':
-                self.pursuePrey(self.my_prey_color)
-                # if self.debug:
-                print(Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
-
-            elif self.state == 'escaping':
-                self.escapeHunter(self.my_hunter_color)
-                # if self.debug:
-                print(Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
+                elif self.state == 'escaping':
+                    self.escapeHunter(self.my_hunter_color)
+                    # if self.debug:
+                    print(Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()

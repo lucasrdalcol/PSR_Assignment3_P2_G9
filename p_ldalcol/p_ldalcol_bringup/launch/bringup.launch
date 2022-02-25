@@ -13,6 +13,9 @@
     <arg name="visualize" default="false"/>
     <arg name="driver" default="false"/>
     <arg name="teleop" default="false"/>
+    <arg name="gmapping" default="false"/>
+    <arg name="navigation" default="false"/>
+    <arg name="map_name" default="map_1"/>
 
     <group ns = "$(arg player_name)">
         <param name="tf_prefix" value="$(arg player_name)" />
@@ -46,9 +49,24 @@
 
     <!--    Launch teleop node if we wish -->
     <group if="$(arg teleop)">
-            <include file="$(find p_ldalcol_bringup)/launch/teleop.launch">
-                <arg name="player_name" value="$(arg player_name)"/>
-            </include>
+        <include file="$(find p_ldalcol_bringup)/launch/teleop.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+        </include>
+    </group>
+
+    <!--    Launch SLAM node if we wish -->
+    <group if="$(arg gmapping)">
+        <include file="$(find p_ldalcol_bringup)/launch/gmapping.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+        </include>
+    </group>
+
+    <!--    Launch navigation node if we wish -->
+    <group if="$(arg navigation)">
+        <include file="$(find p_ldalcol_bringup)/launch/navigation.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+            <arg name="map_name" default="$(arg map_name)"/>
+        </include>
     </group>
 
 <!--    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>-->
