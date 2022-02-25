@@ -51,4 +51,6 @@
             </include>
     </group>
 
+<!--    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>-->
+
 </launch>

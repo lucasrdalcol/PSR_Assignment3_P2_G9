@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 import rospy
 import tf2_ros
+from colorama import Fore
 from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import String
 from psr_parte09_exs.msg import Dog
@@ -33,13 +34,35 @@ class Driver:
         self.name = self.name.strip('/')  # remove initial /
         self.goal = PoseStamped()
         self.goal_active = False
-        self.blue_prey_active = False
-        self.red_prey_active = False
-        self.green_prey_active = False
         self.angle = 0
         self.speed = 0
         self.image_center = 427
         self.debug = rospy.get_param('/debug')
+        self.ranges_red = {'b': {'min': 0, 'max': 50},
+                           'g': {'min': 0, 'max': 50},
+                           'r': {'min': 100, 'max': 256}}
+        self.ranges_green = {'b': {'min': 0, 'max': 50},
+                             'g': {'min': 100, 'max': 256},
+                             'r': {'min': 0, 'max': 50}}
+        self.ranges_blue = {'b': {'min': 100, 'max': 256},
+                            'g': {'min': 0, 'max': 50},
+                            'r': {'min': 0, 'max': 50}}
+        self.mins_red = np.array(
+            [self.ranges_red['b']['min'], self.ranges_red['g']['min'], self.ranges_red['r']['min']])
+        self.maxs_red = np.array(
+            [self.ranges_red['b']['max'], self.ranges_red['g']['max'], self.ranges_red['r']['max']])
+        self.mins_green = np.array(
+            [self.ranges_green['b']['min'], self.ranges_green['g']['min'], self.ranges_green['r']['min']])
+        self.maxs_green = np.array(
+            [self.ranges_green['b']['max'], self.ranges_green['g']['max'], self.ranges_green['r']['max']])
+        self.mins_blue = np.array(
+            [self.ranges_blue['b']['min'], self.ranges_blue['g']['min'], self.ranges_blue['r']['min']])
+        self.maxs_blue = np.array(
+            [self.ranges_blue['b']['max'], self.ranges_blue['g']['max'], self.ranges_blue['r']['max']])
+        # You need to choose 4 or 8 for connectivity type
+        self.connectivity = 4
+        self.state = 'waiting'
+        self.distance_to_center = 0
 
         # Initialize publisher
         self.publisher_command = rospy.Publisher('/' + self.name + '/cmd_vel', Twist, queue_size=1)
@@ -96,38 +119,20 @@ class Driver:
             print(e)
 
         # Segment the color for red players
-        ranges_red = {'b': {'min': 0, 'max': 50},
-                      'g': {'min': 0, 'max': 50},
-                      'r': {'min': 100, 'max': 256}}
-
         # Processing
-        mins_red = np.array([ranges_red['b']['min'], ranges_red['g']['min'], ranges_red['r']['min']])
-        maxs_red = np.array([ranges_red['b']['max'], ranges_red['g']['max'], ranges_red['r']['max']])
-        mask_red = cv2.inRange(rgb_image_original, mins_red, maxs_red)
+        mask_red = cv2.inRange(rgb_image_original, self.mins_red, self.maxs_red)
         # conversion from numpy from uint8 to bool
         mask_red = mask_red.astype(bool)
 
         # Segment the color for green players
-        ranges_green = {'b': {'min': 0, 'max': 50},
-                        'g': {'min': 100, 'max': 256},
-                        'r': {'min': 0, 'max': 50}}
-
         # Processing
-        mins_green = np.array([ranges_green['b']['min'], ranges_green['g']['min'], ranges_green['r']['min']])
-        maxs_green = np.array([ranges_green['b']['max'], ranges_green['g']['max'], ranges_green['r']['max']])
-        mask_green = cv2.inRange(rgb_image_original, mins_green, maxs_green)
+        mask_green = cv2.inRange(rgb_image_original, self.mins_green, self.maxs_green)
         # conversion from numpy from uint8 to bool
         mask_green = mask_green.astype(bool)
 
         # Segment the color for blue players
-        ranges_blue = {'b': {'min': 100, 'max': 256},
-                       'g': {'min': 0, 'max': 50},
-                       'r': {'min': 0, 'max': 50}}
-
         # Processing
-        mins_blue = np.array([ranges_blue['b']['min'], ranges_blue['g']['min'], ranges_blue['r']['min']])
-        maxs_blue = np.array([ranges_blue['b']['max'], ranges_blue['g']['max'], ranges_blue['r']['max']])
-        mask_blue = cv2.inRange(rgb_image_original, mins_blue, maxs_blue)
+        mask_blue = cv2.inRange(rgb_image_original, self.mins_blue, self.maxs_blue)
         # conversion from numpy from uint8 to bool
         mask_blue = mask_blue.astype(bool)
 
@@ -136,6 +141,26 @@ class Driver:
         self.biggest_centroid_green, self.biggest_area_green = self.findCentroid(mask_green.astype(np.uint8) * 255)
         self.biggest_centroid_blue, self.biggest_area_blue = self.findCentroid(mask_blue.astype(np.uint8) * 255)
 
+        # Annotate the closest players of my_team, my_preys and my_hunters
+        if self.name in self.teams['red_team']:
+            if self.biggest_centroid_green is not None:
+                self.state = 'hunting'
+            else:
+                self.state = 'waiting'
+
+        if self.name in self.teams['green_team']:
+            if self.biggest_centroid_blue is not None:
+                self.state = 'hunting'
+            else:
+                self.state = 'waiting'
+
+        if self.name in self.teams['blue_team']:
+            if self.biggest_centroid_red is not None:
+                self.state = 'hunting'
+            else:
+                self.state = 'waiting'
+
+        # Annotate the closest players of my_team, my_preys and my_hunters
         if self.debug is True:
             # Paint largest blobs
             rgb_image_processed = copy.deepcopy(rgb_image_original)
@@ -143,38 +168,24 @@ class Driver:
             rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_green, color='green')
             rgb_image_processed = self.paintBlobs(rgb_image_processed, mask_blue, color='blue')
 
-        # Annotate the closest players of my_team, my_preys and my_hunters
-        if self.biggest_centroid_red is not None:
-            if self.debug is True:
+            if self.biggest_centroid_red is not None:
                 rgb_image_processed = cv2.circle(rgb_image_processed,
-                                                 (round(self.biggest_centroid_red[0]), round(self.biggest_centroid_red[1])),
+                                                 (round(self.biggest_centroid_red[0]),
+                                                  round(self.biggest_centroid_red[1])),
                                                  8, (0, 0, 0), -1)
-            if self.name in self.teams['blue_team']:
-                self.red_prey_active = True
-        else:
-            self.red_prey_active = False
 
-        if self.biggest_centroid_green is not None:
-            if self.debug is True:
+            if self.biggest_centroid_green is not None:
                 rgb_image_processed = cv2.circle(rgb_image_processed,
-                                                 (round(self.biggest_centroid_green[0]), round(self.biggest_centroid_green[1])),
+                                                 (round(self.biggest_centroid_green[0]),
+                                                  round(self.biggest_centroid_green[1])),
                                                  8, (0, 0, 0), -1)
-            if self.name in self.teams['red_team']:
-                self.green_prey_active = True
-        else:
-            self.green_prey_active = False
 
-        if self.biggest_centroid_blue is not None:
-            if self.debug is True:
+            if self.biggest_centroid_blue is not None:
                 rgb_image_processed = cv2.circle(rgb_image_processed,
-                                                 (round(self.biggest_centroid_blue[0]), round(self.biggest_centroid_blue[1])),
+                                                 (round(self.biggest_centroid_blue[0]),
+                                                  round(self.biggest_centroid_blue[1])),
                                                  8, (0, 0, 0), -1)
-            if self.name in self.teams['green_team']:
-                self.blue_prey_active = True
-        else:
-            self.blue_prey_active = False
 
-        if self.debug is True:
             cv2.imshow('Original image', rgb_image_original)  # Display the image
             cv2.imshow('Processed image', rgb_image_processed)  # Display the image
             cv2.imshow('Red players mask', mask_red.astype(np.uint8) * 255)  # Display the segmented image
@@ -194,11 +205,8 @@ class Driver:
         maxArea = 0
         maxLabel = 0
 
-        # You need to choose 4 or 8 for connectivity type
-        connectivity = 4
-
         # Perform the operation
-        output = cv2.connectedComponentsWithStats(mask_original, connectivity, cv2.CV_32S)
+        output = cv2.connectedComponentsWithStats(mask_original, self.connectivity, cv2.CV_32S)
 
         # Get the results
         # The first cell is the number of labels
@@ -308,26 +316,22 @@ class Driver:
         else:
             self.driveStraight()
 
-        if self.my_prey_color == 'red':
-            if not self.red_prey_active:  # No prey, rotate along its axis to find a prey
-                self.speed = 0
-                self.angle = 0.5
-            else:
-                self.pursuePrey(self.my_prey_color)
+        if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams['blue_team']:
+            # If there is a prey detected, pursue prey
+            if self.state == 'waiting':
+                if self.distance_to_center >= 0:
+                    self.speed = 0
+                    self.angle = -0.5  # rotate to right
+                else:
+                    self.speed = 0
+                    self.angle = 0.5  # rotate to left
 
-        elif self.my_prey_color == 'green':
-            if not self.green_prey_active:  # No prey, rotate along its axis to find a prey
-                self.speed = 0
-                self.angle = 0.5
-            else:
+                # if self.debug:
+                print(Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+            elif self.state == 'hunting':
                 self.pursuePrey(self.my_prey_color)
-
-        elif self.my_prey_color == 'blue':
-            if not self.blue_prey_active:  # No prey, rotate along its axis to find a prey
-                self.speed = 0
-                self.angle = 0.5
-            else:
-                self.pursuePrey(self.my_prey_color)
+                # if self.debug:
+                print(Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
@@ -367,7 +371,7 @@ class Driver:
             self.goal_active = False
             rospy.loginfo('Robot achieved its goal.')
 
-    def pursuePrey(self, my_prey_color, maximum_speed=0.75):
+    def pursuePrey(self, my_prey_color, minimum_speed=0.3, maximum_speed=0.9):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param minimum_speed: minimum speed allowed to the robot when driving to the goal pose.
@@ -375,31 +379,71 @@ class Driver:
         """
 
         if my_prey_color == 'red':
-            distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
-            if distance_to_center > 0:  # turn right
-                self.angle = -0.5
-            elif distance_to_center < 0:  # turn left
-                self.angle = 0.5
-            else:  # go straight away to the prey
-                self.angle = 0
+            if self.biggest_centroid_red is not None:
+                self.speed = max(minimum_speed, self.biggest_area_red/10000)  # limit minimum speed
+                self.speed = min(maximum_speed, self.speed)  # limit maximum speed
+
+                self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
+                if self.distance_to_center > 0:  # turn right
+                    self.angle = -0.4
+                elif self.distance_to_center < 0:  # turn left
+                    self.angle = 0.4
+                else:  # go straight away to the prey
+                    self.angle = 0
 
         elif my_prey_color == 'green':
-            distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
-            if distance_to_center > 0:  # turn right
-                self.angle = -0.5
-            elif distance_to_center < 0:  # turn left
-                self.angle = 0.5
-            else:  # go straight away to the prey
-                self.angle = 0
+            if self.biggest_centroid_green is not None:
+                self.speed = max(minimum_speed, self.biggest_area_green/10000)  # limit minimum speed
+                self.speed = min(maximum_speed, self.speed)  # limit maximum speed
+
+                self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
+                if self.distance_to_center > 0:  # turn right
+                    self.angle = -0.4
+                elif self.distance_to_center < 0:  # turn left
+                    self.angle = 0.4
+                else:  # go straight away to the prey
+                    self.angle = 0
 
         elif my_prey_color == 'blue':
-            distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
-            if distance_to_center > 0:  # turn right
-                self.angle = -0.5
-            elif distance_to_center < 0:  # turn left
-                self.angle = 0.5
-            else:  # go straight away to the prey
-                self.angle = 0
+            if self.biggest_centroid_blue is not None:
+                self.speed = max(minimum_speed, self.biggest_area_blue/10000)  # limit minimum speed
+                self.speed = min(maximum_speed, self.speed)  # limit maximum speed
+
+                self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
+                if self.distance_to_center > 0:  # turn right
+                    self.angle = -0.4
+                elif self.distance_to_center < 0:  # turn left
+                    self.angle = 0.4
+                else:  # go straight away to the prey
+                    self.angle = 0
+
+    def escapeHunter(self, my_hunter_color, maximum_speed=0.5):
+        """
+        Function that receives the goal pose and calculate the speed and angle to drive to that goal.
+        :param my_hunter_color:
+        :param maximum_speed: maximum speed allowed to the robot when driving to the goal pose.
+        """
+
+        if my_hunter_color == 'red':
+            self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
+            if self.distance_to_center > 0:  # turn left, to the opposite direction
+                self.angle = 0.75
+            elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                self.angle = -0.75
+
+        elif my_hunter_color == 'green':
+            self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
+            if self.distance_to_center > 0:  # turn left, to the opposite direction
+                self.angle = 0.75
+            elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                self.angle = -0.75
+
+        elif my_hunter_color == 'blue':
+            self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
+            if self.distance_to_center > 0:  # turn left, to the opposite direction
+                self.angle = 0.75
+            elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                self.angle = -0.75
 
         self.speed = maximum_speed
 
@@ -413,7 +457,7 @@ def publisher():
     rospy.init_node('p_ldalcol_driver', anonymous=False)  # Initialize the node
     driver = Driver()
 
-    rate = rospy.Rate(10)  # time rate of the message
+    rate = rospy.Rate(50)  # time rate of the message
 
     rospy.spin()
 
