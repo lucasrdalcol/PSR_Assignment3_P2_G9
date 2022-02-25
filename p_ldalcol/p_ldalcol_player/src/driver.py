@@ -6,7 +6,7 @@
 import argparse
 import copy
 import math
-import colorama
+import random
 import cv2
 import numpy as np
 import rospy
@@ -17,7 +17,8 @@ from std_msgs.msg import String
 from psr_parte09_exs.msg import Dog
 from geometry_msgs.msg import Twist
 from tf2_geometry_msgs import PoseStamped
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, LaserScan
+import std_msgs.msg
 
 
 class Driver:
@@ -62,7 +63,9 @@ class Driver:
         # You need to choose 4 or 8 for connectivity type
         self.connectivity = 4
         self.state = 'waiting'
+        self.lidar_state = None
         self.distance_to_center = 0
+        self.signal = 1
 
         # Initialize publisher
         self.publisher_command = rospy.Publisher('/' + self.name + '/cmd_vel', Twist, queue_size=1)
@@ -88,9 +91,9 @@ class Driver:
         self.image_subscriber = rospy.Subscriber('/' + self.name + '/camera/rgb/image_raw', Image,
                                                  self.detectRobotsWithVisionCallback)
 
-        # # Initialize the detection of the LiDAR 2D
-        # self.lidar_subscriber = rospy.Subscriber('/' + self.name + '/camera/rgb/image_raw', Image,
-        #                                          self.detectRobotsWithVisionCallback)
+        # Initialize the detection of the LiDAR 2D
+        self.lidar_subscriber = rospy.Subscriber('/' + self.name + '/scan', LaserScan,
+                                                 self.detectWallsWithLidarCallback)
 
     def configureMyTeam(self, player_name):
         self.teams = {'red_team': rospy.get_param('/red_players'),
@@ -249,6 +252,23 @@ class Driver:
             cv2.imshow('Blue players mask', mask_blue.astype(np.uint8) * 255)  # Display the segmented image
             cv2.waitKey(1)
 
+    def detectWallsWithLidarCallback(self, lidar_msg):
+        # convert from polar coordinates to cartesian
+        points = []
+        z = 0
+
+        for idx, range in enumerate(lidar_msg.ranges):
+            theta = lidar_msg.angle_min + lidar_msg.angle_increment * idx
+            x = range * math.cos(theta)
+            y = range * math.sin(theta)
+
+            points.append([x, y, z])
+
+        if lidar_msg.ranges[0] < 1.3:
+            self.lidar_state = 'avoid_wall'
+        else:
+            self.lidar_state = None
+
     def findCentroid(self, mask_original):
         """
         Create a mask with the largest blob of mask_original and return its centroid coordinates
@@ -364,33 +384,59 @@ class Driver:
         :param event: not used.
         """
         # print('Sending twist command')
+        signals_list = [-1, 1]
 
         # Check if the goal pose is active or not
-        if self.goal_active:  # No goal, no movement
+        if self.goal_active:
             self.driveStraight()
-        else:
+            if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
+                self.speed = 0.2
+                self.angle = self.signal * 2.0
+                # if self.debug:
+                print(
+                    Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
+            else:
+                self.signal = random.choice(signals_list)
+                print(
+                    Fore.GREEN + 'My name is ' + self.name + ' and I am going to the goal pose.' + Fore.RESET)
+
+        else:  # If there is no goal, play the game.
             if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams['blue_team']:
                 # If there is a prey detected, pursue prey
-                if self.state == 'waiting':
-                    if self.distance_to_center >= 0:
-                        self.speed = 0
-                        self.angle = -0.5  # rotate to right
-                    else:
-                        self.speed = 0
-                        self.angle = 0.5  # rotate to left
-
+                if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
+                    self.speed = 0.2
+                    self.angle = self.signal * 2.0
                     # if self.debug:
-                    print(Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+                    print(Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
+                else:
+                    if self.state == 'waiting':
+                        self.signal = random.choice(signals_list)
+                        if self.distance_to_center >= 0:
+                            self.speed = 0
+                            # self.speed = 0.3
+                            self.angle = -0.5  # rotate to right
+                            # self.angle = 0  # rotate to right
+                        else:
+                            self.speed = 0
+                            # self.speed = 0.3
+                            self.angle = 0.5  # rotate to left
+                            # self.angle = 0  # rotate to left
 
-                elif self.state == 'hunting':
-                    self.pursuePrey(self.my_prey_color)
-                    # if self.debug:
-                    print(Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
+                        # if self.debug:
+                        print(
+                            Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
 
-                elif self.state == 'escaping':
-                    self.escapeHunter(self.my_hunter_color)
-                    # if self.debug:
-                    print(Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
+                    elif self.state == 'hunting':
+                        self.pursuePrey(self.my_prey_color)
+                        # if self.debug:
+                        print(
+                            Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
+
+                    elif self.state == 'escaping':
+                        self.escapeHunter(self.my_hunter_color)
+                        # if self.debug:
+                        print(
+                            Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
@@ -404,7 +450,7 @@ class Driver:
         # if self.state == 'escaping':
         #     rospy.sleep(5)
 
-    def driveStraight(self, minimum_speed=0.1, maximum_speed=0.75):
+    def driveStraight(self, minimum_speed=0.1, maximum_speed=0.3):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param minimum_speed: minimum speed allowed to the robot when driving to the goal pose.
@@ -434,7 +480,7 @@ class Driver:
             self.goal_active = False
             rospy.loginfo('Robot achieved its goal.')
 
-    def pursuePrey(self, my_prey_color, minimum_speed=0.3, maximum_speed=0.9):
+    def pursuePrey(self, my_prey_color, minimum_speed=0.4, maximum_speed=0.9):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param my_prey_color:
@@ -444,7 +490,7 @@ class Driver:
 
         if my_prey_color == 'red':
             if self.biggest_centroid_red is not None:
-                self.speed = max(minimum_speed, self.biggest_area_red/10000)  # limit minimum speed
+                self.speed = max(minimum_speed, self.biggest_area_red / 10000)  # limit minimum speed
                 self.speed = min(maximum_speed, self.speed)  # limit maximum speed
 
                 self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
@@ -457,7 +503,7 @@ class Driver:
 
         elif my_prey_color == 'green':
             if self.biggest_centroid_green is not None:
-                self.speed = max(minimum_speed, self.biggest_area_green/10000)  # limit minimum speed
+                self.speed = max(minimum_speed, self.biggest_area_green / 10000)  # limit minimum speed
                 self.speed = min(maximum_speed, self.speed)  # limit maximum speed
 
                 self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
@@ -470,7 +516,7 @@ class Driver:
 
         elif my_prey_color == 'blue':
             if self.biggest_centroid_blue is not None:
-                self.speed = max(minimum_speed, self.biggest_area_blue/10000)  # limit minimum speed
+                self.speed = max(minimum_speed, self.biggest_area_blue / 10000)  # limit minimum speed
                 self.speed = min(maximum_speed, self.speed)  # limit maximum speed
 
                 self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
@@ -525,7 +571,7 @@ def publisher():
     rospy.init_node('p_ldalcol_driver', anonymous=False)  # Initialize the node
     driver = Driver()
 
-    rate = rospy.Rate(50)  # time rate of the message
+    rate = rospy.Rate(10)  # time rate of the message
 
     rospy.spin()
 
