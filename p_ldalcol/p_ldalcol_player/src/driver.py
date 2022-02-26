@@ -173,7 +173,7 @@ class Driver:
             else:
                 self.state = 'waiting'
 
-        if self.name in self.teams['green_team']:
+        elif self.name in self.teams['green_team']:
             # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
             if self.biggest_centroid_blue is not None and self.biggest_centroid_red is not None:
                 # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
@@ -196,7 +196,7 @@ class Driver:
             else:
                 self.state = 'waiting'
 
-        if self.name in self.teams['blue_team']:
+        elif self.name in self.teams['blue_team']:
             # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
             if self.biggest_centroid_red is not None and self.biggest_centroid_green is not None:
                 # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
@@ -264,7 +264,7 @@ class Driver:
 
             points.append([x, y, z])
 
-        if lidar_msg.ranges[0] < 1.3:
+        if lidar_msg.ranges[0] < 1.0:
             self.lidar_state = 'avoid_wall'
         else:
             self.lidar_state = None
