@@ -1,0 +1,8 @@
+<launch>
+    <arg name="player_name" default="p_vbatista"/>
+    <node name="$(arg player_name)" pkg="p_vbatista_player" type="driver.py" output="screen">
+          <param name="player_name" value="$(arg player_name)"/>
+    </node>
+
+</launch>
+
