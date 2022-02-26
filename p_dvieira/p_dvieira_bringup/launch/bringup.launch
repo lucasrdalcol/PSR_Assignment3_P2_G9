@@ -1,0 +1,56 @@
+<launch>
+
+    <!--    Load team parameters from a yaml file -->
+    <rosparam command="load" file="$(find p_dvieira_bringup)/params/game.yaml"/>
+
+    <!--Bloco 1: argumentos do launch file.-->
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+    <arg name="player_name" default="p_dvieira"/>
+    <arg name="player_color" default="Blue"/>
+    <arg name="x_pos" default="0.0"/>
+    <arg name="y_pos" default="-2.0"/>
+    <arg name="z_pos" default="0.0"/>
+    <arg name="visualize" default="false"/>
+    <arg name="driver" default="false"/>
+    <arg name="teleop" default="false"/>
+
+    <group ns = "$(arg player_name)">
+        <param name="tf_prefix" value="$(arg player_name)" />
+
+        <!--Bloco 3: Carregamento do xacro do robot para o parâmetro robot_description.-->
+        <!--        <param name="robot_description" command="$(find xacro)/xacro &#45;&#45;inorder $(find p_ldalcol_description)/urdf/p_ldalcol.urdf.xacro" />-->
+        <param name="robot_description" command="$(find xacro)/xacro '$(find p_dvieira_description)/urdf/p_dvieira.urdf.xacro'
+                                                    player_name:=$(arg player_name) player_color:=$(arg player_color)" />
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+        <!--        Include the spawn.launch -->
+        <include file="$(find p_dvieira_bringup)/launch/spawn.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+            <arg name="x_pos" value="$(arg x_pos)"/>
+            <arg name="y_pos" value="$(arg y_pos)"/>
+            <arg name="z_pos" value="$(arg z_pos)"/>
+        </include>
+
+        <!--        Include the visualize.launch if we wish -->
+        <group if="$(arg visualize)">
+            <include file="$(find p_dvieira_bringup)/launch/visualize.launch">
+                <arg name="player_name" value="$(arg player_name)"/>
+            </include>
+        </group>
+    </group>
+
+    <!--    Launch driver node if we wish -->
+    <group if="$(arg driver)">
+        <node name="$(arg player_name)" pkg="p_dvieira_player" type="driver.py" output="screen"/>
+    </group>
+
+    <!--    Launch teleop node if we wish -->
+    <group if="$(arg teleop)">
+            <include file="$(find p_dvieira_bringup)/launch/teleop.launch">
+                <arg name="player_name" value="$(arg player_name)"/>
+            </include>
+    </group>
+
+<!--    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>-->
+
+</launch>
