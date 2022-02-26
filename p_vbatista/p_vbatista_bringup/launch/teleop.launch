@@ -1,0 +1,10 @@
+<launch>
+  <arg name="player_name" default="p_vbatista"/>
+
+  <remap from="cmd_vel" to="$(arg player_name)/cmd_vel"/>
+
+  <node pkg="p_vbatista_bringup" type="turtlebot3_teleop_key.py" name="$(arg player_name)_teleop_keyboard"  output="screen">
+  </node>
+
+</launch>
+

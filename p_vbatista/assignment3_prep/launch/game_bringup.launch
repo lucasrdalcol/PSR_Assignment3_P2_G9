@@ -1,0 +1,84 @@
+<launch>
+
+    <rosparam command="load" file="$(find assignment3_prep)/param/game.yaml"/>
+
+<!-- Red Team -->
+    <include file="$(find p_vbatista_bringup)/launch/bringup.launch">
+        <arg name="player_name" value="red1"/>
+        <arg name="player_color" value="Red"/>
+        <arg name="x_pos" value="-1"/>
+        <arg name="y_pos" value="5"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="driver" value="false"/>
+        <arg name="visualize" value="false"/>
+    </include>
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="red2"/> -->
+<!--         <arg name="player_color" value="Red"/> -->
+<!--         <arg name="x_pos" value="1"/> -->
+<!--         <arg name="y_pos" value="5"/> -->
+<!--         <arg name="z_pos" value="0"/> -->
+<!--     </include> -->
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="red3"/> -->
+<!--         <arg name="player_color" value="Red"/> -->
+<!--         <arg name="x_pos" value="0"/> -->
+<!--         <arg name="y_pos" value="5"/> -->
+<!--         <arg name="z_pos" value="0"/> -->
+<!--     </include> -->
+
+<!-- Green Team -->
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="green1"/> -->
+<!--         <arg name="player_color" value="Green"/> -->
+<!--         <arg name="x_pos" default="-1"/> -->
+<!--         <arg name="y_pos" default="6"/> -->
+<!--         <arg name="z_pos" default="0"/> -->
+<!--     </include> -->
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="green2"/> -->
+<!--         <arg name="player_color" value="Green"/> -->
+<!--         <arg name="x_pos" default="1"/> -->
+<!--         <arg name="y_pos" default="6"/> -->
+<!--         <arg name="z_pos" default="0"/> -->
+<!--     </include> -->
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="green3"/> -->
+<!--         <arg name="player_color" value="Green"/> -->
+<!--         <arg name="x_pos" default="0"/> -->
+<!--         <arg name="y_pos" default="6"/> -->
+<!--         <arg name="z_pos" default="0"/> -->
+<!--     </include> -->
+
+<!-- Blue Team -->
+    <include file="$(find p_vbatista_bringup)/launch/bringup.launch">
+        <arg name="player_name" value="blue1"/>
+        <arg name="player_color" value="Blue"/>
+        <arg name="x_pos" default="-1"/>
+        <arg name="y_pos" default="4"/>
+        <arg name="z_pos" default="0"/>
+    </include>
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="blue2"/> -->
+<!--         <arg name="player_color" value="Blue"/> -->
+<!--         <arg name="x_pos" default="1"/> -->
+<!--         <arg name="y_pos" default="4"/> -->
+<!--         <arg name="z_pos" default="0"/> -->
+<!--     </include> -->
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" value="blue3"/> -->
+<!--         <arg name="player_color" value="Blue"/> -->
+<!--         <arg name="x_pos" default="0"/> -->
+<!--         <arg name="y_pos" default="4"/> -->
+<!--         <arg name="z_pos" default="0"/> -->
+<!--     </include> -->
+
+    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>
+
+</launch>

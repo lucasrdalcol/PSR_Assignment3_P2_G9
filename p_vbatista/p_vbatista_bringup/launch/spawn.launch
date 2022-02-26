@@ -1,0 +1,10 @@
+<launch>
+    <arg name="player_name" default="p_vbatista"/>
+    <arg name="x_pos" default="0.0"/>
+    <arg name="y_pos" default="-2.0"/>
+    <arg name="z_pos" default="0.0"/>
+
+<!--     <group ns="$(arg player_name)"> -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg player_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+<!--     </group> -->
+</launch>

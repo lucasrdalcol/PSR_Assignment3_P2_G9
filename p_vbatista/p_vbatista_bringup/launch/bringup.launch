@@ -1,0 +1,57 @@
+<launch>
+    <arg name="player_name" default="p_vbatista"/>
+    <arg name="movebase" default="false"/>
+    <arg name="move_forward_only" default="false"/>
+    <arg name="player_color" default="Bricks"/>
+    <arg name="visualize" default="false"/>
+    <arg name="teleop" default="false"/>
+    <arg name="driver" default="false"/>
+    <arg name="x_pos" default="0.0"/>
+    <arg name="y_pos" default="-2.0"/>
+    <arg name="z_pos" default="0.0"/>
+
+    <group ns="$(arg player_name)">
+        <param name="tf_prefix" value="$(arg player_name)"/>
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find p_vbatista_description)/urdf/p_vbatista.urdf.xacro player_name:=$(arg player_name) player_color:=$(arg player_color)"/>
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+        <include file="$(find p_vbatista_bringup)/launch/spawn.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+            <arg name="x_pos" value="$(arg x_pos)"/>
+            <arg name="y_pos" value="$(arg y_pos)"/>
+            <arg name="z_pos" value="$(arg z_pos)"/>
+        </include>
+
+        <group if="$(arg visualize)">
+            <include file="$(find p_vbatista_bringup)/launch/visualize.launch"/>
+        </group>
+    </group>
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/teleop.launch"> -->
+<!--         <arg name="player_name" value="$(arg player_name)"/> -->
+<!--     </include> -->
+
+    <group if="$(arg teleop)">
+        <include file="$(find p_vbatista_bringup)/launch/teleop.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+        </include>
+    </group>
+
+<!--     <include file="$(find p_vbatista_bringup)/launch/mapping.launch"> -->
+<!--         <arg name="player_name" value="$(arg player_name)"/> -->
+<!--     </include> -->
+
+    <group if="$(arg driver)">
+        <node name="$(arg player_name)" pkg="p_vbatista_player" type="driver.py" output="screen"/>
+    </group>
+
+<!--     <include file="$(find turtlebot3_navigation)/launch/amcl.launch"/> -->
+
+    <group if="$(arg movebase)">
+        <include file="$(find p_vbatista_bringup)/launch/move_base.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+            <arg name="move_forward_only" value="$(arg move_forward_only)"/>
+        </include>
+    </group>
+
+</launch>
