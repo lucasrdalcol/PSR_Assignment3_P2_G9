@@ -59,7 +59,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /p_ldalcol/camera/rgb/image_raw
+      Image Topic: /p_ekrzyszton/camera/rgb/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -92,7 +92,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05000000074505806
       Style: Spheres
-      Topic: /p_ldalcol/scan
+      Topic: /p_ekrzysztonscan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -159,8 +159,8 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: p_ldalcol/robot_description
-      TF Prefix: p_ldalcol
+      Robot Description: p_ekrzyszton/robot_description
+      TF Prefix: p_ekrzyszton
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -169,29 +169,29 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        p_ldalcol/base_footprint:
+        p_ekrzyszton/base_footprint:
           Value: true
-        p_ldalcol/base_link:
+        p_ekrzyszton/base_link:
           Value: true
-        p_ldalcol/base_scan:
+        p_ekrzyszton/base_scan:
           Value: true
-        p_ldalcol/camera_link:
+        p_ekrzyszton/camera_link:
           Value: true
-        p_ldalcol/camera_rgb_frame:
+        p_ekrzyszton/camera_rgb_frame:
           Value: true
-        p_ldalcol/camera_rgb_optical_frame:
+        p_ekrzyszton/camera_rgb_optical_frame:
           Value: true
-        p_ldalcol/caster_back_left_link:
+        p_ekrzyszton/caster_back_left_link:
           Value: true
-        p_ldalcol/caster_back_right_link:
+        p_ekrzyszton/caster_back_right_link:
           Value: true
-        p_ldalcol/imu_link:
+        p_ekrzyszton/imu_link:
           Value: true
-        p_ldalcol/odom:
+        p_ekrzyszton/odom:
           Value: true
-        p_ldalcol/wheel_left_link:
+        p_ekrzyszton/wheel_left_link:
           Value: true
-        p_ldalcol/wheel_right_link:
+        p_ekrzyszton/wheel_right_link:
           Value: true
       Marker Alpha: 1
       Marker Scale: 1
@@ -200,24 +200,24 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        p_ldalcol/odom:
-          p_ldalcol/base_footprint:
-            p_ldalcol/base_link:
-              p_ldalcol/base_scan:
+        p_ekrzyszton/odom:
+          p_ekrzyszton/base_footprint:
+            p_ekrzyszton/base_link:
+              p_ekrzyszton/base_scan:
                 {}
-              p_ldalcol/camera_link:
-                p_ldalcol/camera_rgb_frame:
-                  p_ldalcol/camera_rgb_optical_frame:
+              p_ekrzyszton/camera_link:
+                p_ekrzyszton/camera_rgb_frame:
+                  p_ekrzyszton/camera_rgb_optical_frame:
                     {}
-              p_ldalcol/caster_back_left_link:
+              p_ekrzyszton/caster_back_left_link:
                 {}
-              p_ldalcol/caster_back_right_link:
+              p_ekrzyszton/caster_back_right_link:
                 {}
-              p_ldalcol/imu_link:
+              p_ekrzyszton/imu_link:
                 {}
-              p_ldalcol/wheel_left_link:
+              p_ekrzyszton/wheel_left_link:
                 {}
-              p_ldalcol/wheel_right_link:
+              p_ekrzyszton/wheel_right_link:
                 {}
       Update Interval: 0
       Value: true
@@ -227,7 +227,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: false
       Name: Map
-      Topic: /p_ldalcol/map
+      Topic: /p_ekrzyszton/map
       Unreliable: false
       Use Timestamp: false
       Value: false
@@ -251,7 +251,7 @@ Visualization Manager:
   Global Options:
     Background Color: 255; 255; 255
     Default Light: true
-    Fixed Frame: p_ldalcol/odom
+    Fixed Frame: p_ekrzyszton/odom
     Frame Rate: 30
   Name: root
   Tools:

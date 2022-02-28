@@ -1,6 +1,6 @@
 <launch>
   <!-- Arguments -->
-  <arg name="player_name" default="p_ldalcol"/>
+  <arg name="player_name" default="p_ekrzyszton"/>
   <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
   <arg name="map_name" default="map_1"/>
   <arg name="open_rviz" default="false"/>
@@ -12,7 +12,7 @@
 <!--  </include>-->
 
   <!-- Map server -->
-  <node pkg="map_server" name="map_server" type="map_server" args="$(find p_ldalcol_description)/maps/$(arg map_name).yaml"/>
+  <node pkg="map_server" name="map_server" type="map_server" args="$(find p_ekrzyszton_description)/maps/$(arg map_name).yaml"/>
 
   <!-- AMCL -->
   <include file="$(find p_ekrzyszton_bringup)/launch/amcl.launch">
