@@ -1,4 +1,4 @@
-image: /home/lucasrdalcol/catkin_ws/src/PSR_Assignment3_P2_G9/p_ldalcol/p_ekrzyszton_description/maps/map_1.pgm
+image: /home/edkami/catkin_ws/src/PSR_Assignment3_P2_G9/p_ekrzyszton/p_ekrzyszton_description/maps/map_1.pgm
 resolution: 0.050000
 origin: [-100.000000, -100.000000, 0.000000]
 negate: 0
