@@ -12,10 +12,11 @@ The team with the most points wins.
 
 ## Program functionalities Overview
 
-### Gameplay area
-In our project, two arenas have been implemented in which the game is possible:
+### Gameplay arena
+In our project, three arenas have been implemented in which the game is possible:
 - th_arena_1.world
 - th_arena_2.world
+- th_arena_3.world
 
 
 ## Usage of program
