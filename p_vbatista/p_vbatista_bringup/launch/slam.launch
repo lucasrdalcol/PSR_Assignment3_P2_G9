@@ -14,6 +14,3 @@
         args="--display-config $(find p_vbatista_bringup)/config/mapping.rviz" required="false"/>
 
 </launch>
-
-
-<!-- rosrun map_server map_saver -f ~/map_1 map:=/red1/map -->
