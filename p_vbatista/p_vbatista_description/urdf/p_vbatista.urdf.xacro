@@ -18,10 +18,11 @@
 <!--  Robot base-->
   <link name="base_link">
     <visual>
-      <origin xyz="-0.064 0.0 0.047" rpy="0 0 0"/>
+      <origin xyz="-0.064 0 0.0" rpy="0 0 0"/>
+<!--      <origin xyz="-0.064 0.0 0.047" rpy="0 0 0"/>-->
       <geometry>
-<!--        <mesh filename="package://turtlebot3_description/meshes/bases/waffle_pi_base.stl" scale="0.001 0.001 0.001"/>-->
-        <box size="0.2 0.27 0.094"/>
+        <mesh filename="package://turtlebot3_description/meshes/bases/waffle_pi_base.stl" scale="0.001 0.001 0.001"/>
+<!--        <box size="0.2 0.27 0.094"/>-->
       </geometry>
       <material name="$(arg player_color)"/>
     </visual>

@@ -5,7 +5,7 @@
 
     <!--Bloco 1: argumentos do launch file.-->
     <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
-    <arg name="player_name" default="p_ldalcol"/>
+    <arg name="player_name" default="p_ekrzyszton"/>
     <arg name="player_color" default="Blue"/>
     <arg name="x_pos" default="0.0"/>
     <arg name="y_pos" default="-2.0"/>
@@ -21,8 +21,8 @@
         <param name="tf_prefix" value="$(arg player_name)" />
 
         <!--Bloco 3: Carregamento do xacro do robot para o parâmetro robot_description.-->
-        <!--        <param name="robot_description" command="$(find xacro)/xacro &#45;&#45;inorder $(find p_ekrzyszton_description)/urdf/p_ldalcol.urdf.xacro" />-->
-        <param name="robot_description" command="$(find xacro)/xacro '$(find p_ldalcol_description)/urdf/p_ldalcol.urdf.xacro'
+        <!--        <param name="robot_description" command="$(find xacro)/xacro &#45;&#45;inorder $(find p_ekrzyszton_description)/urdf/p_ekrzyszton.urdf.xacro" />-->
+        <param name="robot_description" command="$(find xacro)/xacro '$(find p_ekrzyszton_description)/urdf/p_ekrzyszton.urdf.xacro'
                                                     player_name:=$(arg player_name) player_color:=$(arg player_color)" />
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
@@ -44,7 +44,7 @@
 
     <!--    Launch driver node if we wish -->
     <group if="$(arg driver)">
-        <node name="$(arg player_name)" pkg="p_ldalcol_player" type="driver.py" output="screen"/>
+        <node name="$(arg player_name)" pkg="p_ekrzyszton_player" type="driver.py" output="screen"/>
     </group>
 
     <!--    Launch teleop node if we wish -->

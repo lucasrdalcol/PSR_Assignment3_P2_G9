@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
-<robot name="p_ldalcol" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="p_ekrzyszton" xmlns:xacro="http://ros.org/wiki/xacro">
   <!--  Xacro description of turtlebot robot waffle pi used to play team hunt.-->
-  <!--  Lucas Rodrigues Dal'Col-->
+  <!--  Emanuel Krzysztoń -->
   <!--  PSR, January 2021-->
 
   <!--Args are local, properties are global, so we copy the values of the arguments to the properties-->
-  <xacro:arg name="player_name" default="p_ldalcol" />
+  <xacro:arg name="player_name" default="p_ekrzyszton" />
   <xacro:arg name="player_color" default="Blue" /> <!-- e.g. Red, Orange. Must exist in Gazebo/Colors and be defined in properties.xacro.-->
 
 <!--  &lt;!&ndash;Properties are global so they can be viewed from inside the included xacros&ndash;&gt;-->
@@ -17,7 +17,7 @@
   <xacro:include filename="$(find p_ekrzyszton_description)/urdf/properties.xacro"/>
 
   <!--  <xacro:include filename="$(find ${player_name}_description)/urdf/player.gazebo.xacro"/>-->
-  <xacro:include filename="$(find p_ekrzyszton_description)/urdf/p_ldalcol.gazebo.macro.xacro"/>
+  <xacro:include filename="$(find p_ekrzyszton_description)/urdf/p_ekrzyszton.gazebo.macro.xacro"/>
   <xacro:gazebo_macro player_color="$(arg player_color)" laser_visual="false" camera_visual="false" imu_visual="false"/>
 
   <link name="base_footprint"/>

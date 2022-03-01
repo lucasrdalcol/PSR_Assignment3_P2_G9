@@ -568,7 +568,7 @@ def publisher():
     # ----------------------------------
 
     # Initialize node and call class instance
-    rospy.init_node('p_ldalcol_driver', anonymous=False)  # Initialize the node
+    rospy.init_node('p_ekrzyszton_driver', anonymous=False)  # Initialize the node
     driver = Driver()
 
     rate = rospy.Rate(10)  # time rate of the message

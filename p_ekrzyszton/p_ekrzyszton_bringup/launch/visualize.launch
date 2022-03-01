@@ -1,6 +1,6 @@
 <launch>
     <!--Bloco 1: argumentos do launch file.-->
-    <arg name="player_name" default="p_ldalcol"/>
+    <arg name="player_name" default="p_ekrzyszton"/>
 
     <!-- Launch rviz, loading configuration file -->
     <node name="rviz" pkg="rviz" type="rviz" args="--display-config $(find p_ekrzyszton_bringup)/config/$(arg player_name).rviz" required="false"/>

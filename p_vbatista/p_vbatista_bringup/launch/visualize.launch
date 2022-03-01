@@ -1,4 +1,4 @@
 <launch>
-    <node name="rviz" pkg="rviz" type="rviz"
-          args="--display-config $(find p_vbatista_bringup)/config/visualize.rviz" required="false"/>
+        <node name="rviz" pkg="rviz" type="rviz"
+              args="--display-config $(find p_vbatista_bringup)/config/visualize.rviz" required="false"/>
 </launch>

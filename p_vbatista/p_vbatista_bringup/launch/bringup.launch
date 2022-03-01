@@ -1,8 +1,11 @@
 <launch>
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
     <arg name="player_name" default="p_vbatista"/>
     <arg name="movebase" default="false"/>
+    <arg name="slam" default="false"/>
+    <arg name="navigation" default="false"/>
     <arg name="move_forward_only" default="false"/>
-    <arg name="player_color" default="Bricks"/>
+    <arg name="player_color" default="Red"/>
     <arg name="visualize" default="false"/>
     <arg name="teleop" default="false"/>
     <arg name="driver" default="false"/>
@@ -27,30 +30,31 @@
         </group>
     </group>
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/teleop.launch"> -->
-<!--         <arg name="player_name" value="$(arg player_name)"/> -->
-<!--     </include> -->
-
     <group if="$(arg teleop)">
         <include file="$(find p_vbatista_bringup)/launch/teleop.launch">
             <arg name="player_name" value="$(arg player_name)"/>
         </include>
     </group>
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/mapping.launch"> -->
-<!--         <arg name="player_name" value="$(arg player_name)"/> -->
-<!--     </include> -->
+<!--     <group if="$(arg gmapping)"> -->
+<!--         <include file="$(find p_vbatista_bringup)/launch/mapping.launch"> -->
+<!--             <arg name="player_name" value="$(arg player_name)"/> -->
+<!--         </include> -->
+<!--     </group> -->
 
     <group if="$(arg driver)">
         <node name="$(arg player_name)" pkg="p_vbatista_player" type="driver.py" output="screen"/>
     </group>
 
-<!--     <include file="$(find turtlebot3_navigation)/launch/amcl.launch"/> -->
-
-    <group if="$(arg movebase)">
-        <include file="$(find p_vbatista_bringup)/launch/move_base.launch">
+    <group if="$(arg slam)">
+        <include file="$(find p_vbatista_bringup)/launch/slam.launch">
             <arg name="player_name" value="$(arg player_name)"/>
-            <arg name="move_forward_only" value="$(arg move_forward_only)"/>
+        </include>
+    </group>
+
+    <group if="$(arg navigation)">
+        <include file="$(find p_vbatista_bringup)/launch/navigation.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
         </include>
     </group>
 

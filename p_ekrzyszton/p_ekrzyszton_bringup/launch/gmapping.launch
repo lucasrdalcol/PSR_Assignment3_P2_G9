@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="player_name" default="p_ldalcol"/>
+    <arg name="player_name" default="p_ekrzyszton"/>
 
     <group ns = "$(arg player_name)">
         <node name="gmapping" pkg="gmapping" type="slam_gmapping">
