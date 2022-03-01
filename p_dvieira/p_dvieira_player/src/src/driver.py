@@ -264,11 +264,19 @@ class Driver:
 
             points.append([x, y, z])
 
+
+
+        wall_flag = False
         for i in lidar_msg.ranges:
             if i < 1.3:
-                self.lidar_state = 'avoid_wall'
-            else:
-                self.lidar_state = None
+                wall_flag = True
+
+        if wall_flag == True:
+            self.lidar_state = 'avoid_wall'
+        else:
+            self.lidar_state = None
+
+
 
     def findCentroid(self, mask_original):
         """
@@ -391,8 +399,8 @@ class Driver:
         if self.goal_active:
             self.driveStraight()
             if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
-                self.speed = 0.2
-                self.angle = self.signal * 2.0
+                self.speed = 0.4
+                self.angle = self.signal * 4.0
                 # if self.debug:
                 print(
                     Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
@@ -405,8 +413,8 @@ class Driver:
             if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams['blue_team']:
                 # If there is a prey detected, pursue prey
                 if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
-                    self.speed = 0.2
-                    self.angle = self.signal * 2.0
+                    self.speed = -0.3
+                    self.angle = self.signal * 5.0
                     # if self.debug:
                     print(Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
                 else:
@@ -414,14 +422,14 @@ class Driver:
                         self.signal = random.choice(signals_list)
                         if self.distance_to_center >= 0:
                             # self.speed = 0
-                            self.speed = 0.3
-                            self.angle = -0.5  # rotate to right
-                            # self.angle = 0  # rotate to right
+                            self.speed = 1
+                            # self.angle = -0.5  # rotate to right
+                            self.angle = 0  # rotate to right
                         else:
                             # self.speed = 0
-                            self.speed = 0.3
-                            self.angle = 0.5  # rotate to left
-                            # self.angle = 0  # rotate to left
+                            self.speed = 1
+                            # self.angle = 0.5  # rotate to left
+                            self.angle = 0  # rotate to left
 
                         # if self.debug:
                         print(
@@ -451,7 +459,7 @@ class Driver:
         # if self.state == 'escaping':
         #     rospy.sleep(5)
 
-    def driveStraight(self, minimum_speed=0.1, maximum_speed=0.3):
+    def driveStraight(self, minimum_speed=0.1, maximum_speed=0.5):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param minimum_speed: minimum speed allowed to the robot when driving to the goal pose.
@@ -481,7 +489,7 @@ class Driver:
             self.goal_active = False
             rospy.loginfo('Robot achieved its goal.')
 
-    def pursuePrey(self, my_prey_color, minimum_speed=0.4, maximum_speed=0.9):
+    def pursuePrey(self, my_prey_color, minimum_speed=0.3, maximum_speed=0.6):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param my_prey_color:
