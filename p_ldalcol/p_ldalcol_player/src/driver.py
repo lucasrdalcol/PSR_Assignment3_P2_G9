@@ -66,6 +66,7 @@ class Driver:
         self.connectivity = 4
         self.camera_state = 'waiting'
         self.lidar_state = None
+        self.current_state = None
         # self.collision_state = None
         self.distance_to_center = 0
         self.signal = 1
@@ -74,7 +75,13 @@ class Driver:
         self.publisher_command = rospy.Publisher('/' + self.name + '/cmd_vel', Twist, queue_size=1)
 
         # Initialize publisher of marker arrays
-        self.publisher_markers = rospy.Publisher('/' + self.name + '/marker_array', MarkerArray, queue_size=1)
+        self.publisher_markers_spheres = rospy.Publisher('/' + self.name + '/marker_array', MarkerArray, queue_size=1)
+
+        # Initialize publisher of text marker
+        self.publisher_text_marker = rospy.Publisher('/' + self.name + '/text_marker', Marker, queue_size=1)
+
+        # Initialize publisher of cubes to represent the robots
+        self.publisher_cube_marker = rospy.Publisher('/' + self.name + '/cube_marker', Marker, queue_size=1)
 
         # Initialize tf2 buffer and listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -264,50 +271,71 @@ class Driver:
 
     def detectWallsWithLidarCallback(self, lidar_msg):
 
-        # Check the close ranges between an angle of 40 degrees to the front of the robot
+        # Option 1: without clustering for the robots.
         close_ranges = []
 
+        # Check the close ranges between an angle of 40 degrees to the front of the robot
+        for range in lidar_msg.ranges[0:20]:
+            close_ranges.append(range)
         for range in lidar_msg.ranges[340:360]:
             close_ranges.append(range)
 
-        for range in lidar_msg.ranges[0:20]:
-            close_ranges.append(range)
+        if any(range < 0.8 for range in close_ranges):
+            self.lidar_state = 'avoid_wall'
+        else:
+            self.lidar_state = None
 
-        # Cluster the vision within this 40 degrees to ignore other robots, but not the walls.
-        cluster = {0: []}
-        cluster_idx = 0
-        for idx, (range1, range2) in enumerate(zip(close_ranges[:-1], close_ranges[1:])):
-            diff = abs(range2 - range1)
-            cluster[cluster_idx].append(range1)
-            if diff > 0.8:
-                cluster_idx += 1
-                cluster[cluster_idx] = []
+        # # option 2: with clustering
+        # # Check the close ranges between an angle of 40 degrees to the front of the robot
+        # close_ranges = []
+        #
+        # for range in lidar_msg.ranges[340:360]:
+        #     close_ranges.append(range)
+        #
+        # for range in lidar_msg.ranges[0:20]:
+        #     close_ranges.append(range)
+        #
+        # # Cluster the vision within this 40 degrees to ignore other robots, but not the walls.
+        # cluster = {0: []}
+        # cluster_idx = 0
+        # for idx, (range1, range2) in enumerate(zip(close_ranges[:-1], close_ranges[1:])):
+        #     diff = abs(range2 - range1)
+        #     cluster[cluster_idx].append(range1)
+        #     if diff > 0.4:
+        #         cluster_idx += 1
+        #         cluster[cluster_idx] = []
+        #
+        # # Exclude robots detections
+        # for cluster_key, cluster_value in cluster.items():
+        #     if len(cluster_value) <= 3:
+        #         cluster_value.clear()
+        #
+        # print(cluster)
+        #
+        # for close_ranges in cluster.values():
+        #     if any(range < 0.8 for range in close_ranges):
+        #         self.lidar_state = 'avoid_wall'
+        #     else:
+        #         self.lidar_state = None
 
-        # Exclude robots detections
-        for cluster_key, cluster_value in cluster.items():
-            if len(cluster_value) < 5:
-                cluster_value.clear()
-
-        for close_ranges in cluster.values():
-            if any(range < 0.8 for range in close_ranges):
-                self.lidar_state = 'avoid_wall'
-            else:
-                self.lidar_state = None
-
-        # Clustering
-        thresh = 2.0
+        ############################
+        # Clustering using markers
+        ############################
+        thresh = 0.3
 
         marker_array = MarkerArray()
-        marker = self.createMarker(0)
+        marker = self.createSphereMarker(0)
         marker_array.markers.append(marker)
 
         for idx, (range1, range2) in enumerate(zip(lidar_msg.ranges[:-1], lidar_msg.ranges[1:])):
             if range1 < 0.1 or range2 < 0.1:
                 continue
+            if range1 > 30 or range2 > 30:
+                continue
 
             diff = abs(range2 - range1)
             if diff > thresh:
-                marker = self.createMarker(idx + 1)
+                marker = self.createSphereMarker(idx + 1)
                 marker_array.markers.append(marker)
 
             theta = lidar_msg.angle_min + lidar_msg.angle_increment * idx
@@ -318,7 +346,18 @@ class Driver:
             last_marker = marker_array.markers[-1]
             last_marker.points.append(point)
 
-        self.publisher_markers.publish(marker_array)
+        for marker in marker_array.markers:
+            marker_points = marker.points
+            print(len(marker_points))
+            if len(marker_points) < 10:
+                robot_point = marker_points[0]
+                cube_marker = self.createCubeMarker(x=robot_point.x, y=robot_point.y)
+                self.publisher_cube_marker.publish(cube_marker)
+                # print(robot_point)
+                # print(robot_point.x)
+
+        print(len(marker_array.markers))
+        self.publisher_markers_spheres.publish(marker_array)
         # rospy.loginfo('Published clustered laser scan messages')
 
     # def contactReceivedCallback(self, msg):
@@ -345,26 +384,73 @@ class Driver:
     #         else:
     #             self.collision_state = None
 
-    def createMarker(self, id):
-        marker = Marker()
-        marker.header.frame_id = self.name + '/base_scan'
-        marker.ns = self.name
-        marker.id = id
-        marker.type = marker.SPHERE_LIST
-        marker.action = marker.ADD
-        marker.pose.position.x = 0
-        marker.pose.position.y = 0
-        marker.pose.position.z = 0
-        marker.pose.orientation.w = 1.0
-        marker.color.r = random.random()
-        marker.color.g = random.random()
-        marker.color.b = random.random()
-        marker.color.a = 1.0  # Don't forget to set the alpha!
-        marker.scale.x = 0.1
-        marker.scale.y = 0.1
-        marker.scale.z = 0.1
+    def createSphereMarker(self, id):
+        marker_sphere = Marker()
+        marker_sphere.header.frame_id = self.name + '/base_scan'
+        marker_sphere.ns = self.name
+        marker_sphere.id = id
+        marker_sphere.type = marker_sphere.SPHERE_LIST
+        marker_sphere.action = marker_sphere.ADD
+        marker_sphere.pose.position.x = 0
+        marker_sphere.pose.position.y = 0
+        marker_sphere.pose.position.z = 0
+        marker_sphere.pose.orientation.w = 1.0
+        marker_sphere.color.r = random.random()
+        marker_sphere.color.g = random.random()
+        marker_sphere.color.b = random.random()
+        marker_sphere.color.a = 1.0  # Don't forget to set the alpha!
+        marker_sphere.scale.x = 0.1
+        marker_sphere.scale.y = 0.1
+        marker_sphere.scale.z = 0.1
 
-        return marker
+        return marker_sphere
+
+    def createTextMarker(self, text):
+        # Text
+        marker_text = Marker()
+        marker_text.header.frame_id = self.name + '/base_scan'
+        marker_text.ns = self.name
+        marker_text.text = text
+        marker_text.type = marker_text.TEXT_VIEW_FACING
+        marker_text.action = marker_text.ADD
+        marker_text.pose.position.x = 0
+        marker_text.pose.position.y = 0
+        marker_text.pose.position.z = 0.5
+        marker_text.pose.orientation.x = 0.0
+        marker_text.pose.orientation.y = 0.0
+        marker_text.pose.orientation.z = 0.0
+        marker_text.pose.orientation.w = 1.0
+        marker_text.scale.z = 0.2
+        marker_text.color.a = 1.0  # Don't forget to set the alpha!
+        marker_text.color.r = 0.0
+        marker_text.color.g = 0.0
+        marker_text.color.b = 0.0
+
+        return marker_text
+
+    def createCubeMarker(self, x, y):
+        # Cube
+        marker_cube = Marker()
+        marker_cube.header.frame_id = self.name + '/base_scan'
+        marker_cube.ns = self.name
+        marker_cube.type = marker_cube.CUBE
+        marker_cube.action = marker_cube.ADD
+        marker_cube.pose.position.x = x
+        marker_cube.pose.position.y = y
+        marker_cube.pose.position.z = 0
+        marker_cube.pose.orientation.x = 0.0
+        marker_cube.pose.orientation.y = 0.0
+        marker_cube.pose.orientation.z = 0.0
+        marker_cube.pose.orientation.w = 1.0
+        marker_cube.scale.x = 0.1
+        marker_cube.scale.y = 0.1
+        marker_cube.scale.z = 0.1
+        marker_cube.color.a = 1.0  # Don't forget to set the alpha!
+        marker_cube.color.r = 1.0
+        marker_cube.color.g = 0.0
+        marker_cube.color.b = 0.0
+
+        return marker_cube
 
     def findCentroid(self, mask_original):
         """
@@ -493,15 +579,19 @@ class Driver:
             #     print(
             #         Fore.RED + 'My name is ' + self.name + ' and I am hitting the wall. Reverse state.' + Fore.RESET)
             if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
-                self.speed = 0.1
+                self.speed = 0.2
                 self.angle = self.signal * 2.0
                 # if self.debug:
-                print(
-                    Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
+                self.current_state = 'avoid_wall'
+
+                if self.debug:
+                    print(Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
             else:
                 self.signal = random.choice(signals_list)
-                print(
-                    Fore.GREEN + 'My name is ' + self.name + ' and I am going to the goal pose.' + Fore.RESET)
+                self.current_state = 'goal_active'
+
+                if self.debug:
+                    print(Fore.GREEN + 'My name is ' + self.name + ' and I am going to the goal pose.' + Fore.RESET)
 
         else:  # If there is no goal, play the game.
             if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams[
@@ -514,40 +604,44 @@ class Driver:
                 #     print(
                 #         Fore.RED + 'My name is ' + self.name + ' and I am hitting the wall. Reverse state.' + Fore.RESET)
                 if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
-                    self.speed = 0.1
-                    self.angle = self.signal * 2.0
-                    # if self.debug:
-                    print(
-                        Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
+                    if not self.camera_state == 'hunting':  # If the hunting mode is on, the lidar is detecting a robot prey
+                        self.speed = 0.2
+                        self.angle = self.signal * 2.0
+                        # if self.debug:
+                        self.current_state = 'avoid_wall'
+                        if self.debug:
+                            print(Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
                 else:
                     if self.camera_state == 'waiting':
                         self.signal = random.choice(signals_list)
                         if self.distance_to_center >= 0:
                             # self.speed = 0
-                            self.speed = 0.2
-                            self.angle = -0.5  # rotate to right
-                            # self.angle = 0  # rotate to right
+                            self.speed = 0.3
+                            # self.angle = -0.5  # rotate to right
+                            self.angle = 0  # rotate to right
                         else:
                             # self.speed = 0
-                            self.speed = 0.2
-                            self.angle = 0.5  # rotate to left
-                            # self.angle = 0  # rotate to left
+                            self.speed = 0.3
+                            # self.angle = 0.5  # rotate to left
+                            self.angle = 0  # rotate to left
 
-                        # if self.debug:
-                        print(
-                            Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+                        self.current_state = 'waiting'
+                        if self.debug:
+                            print(Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
 
                     elif self.camera_state == 'hunting':
                         self.pursuePrey(self.my_prey_color)
-                        # if self.debug:
-                        print(
-                            Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
+
+                        self.current_state = 'hunting'
+                        if self.debug:
+                            print(Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
 
                     elif self.camera_state == 'escaping':
                         self.escapeHunter(self.my_hunter_color)
-                        # if self.debug:
-                        print(
-                            Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
+
+                        self.current_state = 'escaping'
+                        if self.debug:
+                            print(Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
@@ -557,9 +651,13 @@ class Driver:
         # Publish the twist command to the robot
         self.publisher_command.publish(twist)
 
+        # Publish the current state text marker
+        text_marker = self.createTextMarker(self.current_state)
+        self.publisher_text_marker.publish(text_marker)
+
         # If there is a hunter, escape from him for 2 seconds to maintain the speed and angle commands.
         if self.camera_state == 'escaping':
-            rospy.sleep(5)
+            rospy.sleep(4)
 
     def driveStraight(self, minimum_speed=0.1, maximum_speed=0.3):
         """
