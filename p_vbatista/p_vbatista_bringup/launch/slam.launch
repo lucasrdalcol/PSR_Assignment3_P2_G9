@@ -1,0 +1,19 @@
+<launch>
+  <!-- Arguments -->
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+<!--     <arg name="configuration_basename" default="turtlebot3_lds_2d.lua"/> -->
+    <arg name="player_name" default="p_vbatista"/>
+
+  <!-- SLAM: Gmapping, Cartographer, Hector, Karto, Frontier_exploration, RTAB-Map -->
+    <include file="$(find p_vbatista_bringup)/launch/mapping.launch">
+        <arg name="player_name" value="$(arg player_name)"/>
+    </include>
+
+<!--   <include file="$(find p_vbatista_bringup)/launch/visualize.launch"/> -->
+    <node name="rviz" pkg="rviz" type="rviz"
+        args="--display-config $(find p_vbatista_bringup)/config/mapping.rviz" required="false"/>
+
+</launch>
+
+
+<!-- rosrun map_server map_saver -f ~/map_1 map:=/red1/map -->

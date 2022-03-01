@@ -1,31 +1,23 @@
 <launch>
     <arg name="player_name" default="p_vbatista"/>
-<!--     <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/> -->
-    <arg name="cmd_vel_topic" default="/cmd_vel" />
-    <arg name="odom_topic" default="odom" />
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+    <arg name="cmd_vel_topic" default="/p_vbatista/cmd_vel" />
+    <arg name="odom_topic" default="p_vbatista/odom" />
     <arg name="move_forward_only" default="false"/>
 
     <group ns="$(arg player_name)">
-
-        <master auto="start"/>
- <!-- Run the map server -->
-            <node name="map_server" pkg="map_server" type="map_server" args="$(find turtlebot3_navigation)/maps/map.yaml"/>
-
- <!--- Run AMCL -->
-        <include file="$(find turtlebot3_navigation)/launch/amcl.launch" />
-
-        <node pkg="move_base" type="move_base" respawn="false" name="$(arg player_name)" output="screen">
-<!--             <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" /> -->
-            <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-            <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_waffle_pi.yaml" command="load" ns="global_costmap" />
-            <rosparam file="$(find turtlebot3_navigation)/param/costmap_common_params_waffle_pi.yaml" command="load" ns="local_costmap" />
-            <rosparam file="$(find turtlebot3_navigation)/param/local_costmap_params.yaml" command="load" />
-            <rosparam file="$(find turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
-            <rosparam file="$(find turtlebot3_navigation)/param/base_local_planner_params.yaml" command="load" />
-            <rosparam file="$(find turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
-            <rosparam file="$(find turtlebot3_navigation)/param/dwa_local_planner_params_waffle_pi.yaml" command="load" />
-            <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
-<!--             <param name="controller_frequency" value="10.0" /> -->
-        </node>
+      <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+        <rosparam file="$(find p_vbatista_bringup)/yaml/costmap_common_params_waffle.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find p_vbatista_bringup)/yaml/costmap_common_params_waffle.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find p_vbatista_bringup)/yaml/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find p_vbatista_bringup)/yaml/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find p_vbatista_bringup)/yaml/move_base_params.yaml" command="load" />
+        <rosparam file="$(find p_vbatista_bringup)/yaml/dwa_local_planner_params_waffle.yaml" command="load" />
+        <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+        <remap from="odom" to="$(arg odom_topic)"/>
+        <remap from="map" to="/map"/>
+        <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
+      </node>
     </group>
 </launch>
