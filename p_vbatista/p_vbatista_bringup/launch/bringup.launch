@@ -9,6 +9,7 @@
     <arg name="visualize" default="false"/>
     <arg name="teleop" default="false"/>
     <arg name="driver" default="false"/>
+    <arg name="arena" default="th_arena_1"/>
     <arg name="x_pos" default="0.0"/>
     <arg name="y_pos" default="-2.0"/>
     <arg name="z_pos" default="0.0"/>
@@ -36,12 +37,6 @@
         </include>
     </group>
 
-<!--     <group if="$(arg gmapping)"> -->
-<!--         <include file="$(find p_vbatista_bringup)/launch/mapping.launch"> -->
-<!--             <arg name="player_name" value="$(arg player_name)"/> -->
-<!--         </include> -->
-<!--     </group> -->
-
     <group if="$(arg driver)">
         <node name="$(arg player_name)" pkg="p_vbatista_player" type="driver.py" output="screen"/>
     </group>
@@ -55,6 +50,7 @@
     <group if="$(arg navigation)">
         <include file="$(find p_vbatista_bringup)/launch/navigation.launch">
             <arg name="player_name" value="$(arg player_name)"/>
+            <arg name="arena" value="$(arg arena)"/>
         </include>
     </group>
 

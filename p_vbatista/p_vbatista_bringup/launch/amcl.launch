@@ -1,6 +1,7 @@
 <launch>
   <!-- Arguments -->
-  <arg name="scan_topic"     default="p_vbatista/scan"/>
+  <arg name="player_name"    default="p_vbatista"/>
+  <arg name="scan_topic"     default="$(arg player_name)/scan"/>
   <arg name="initial_pose_x" default="0.0"/>
   <arg name="initial_pose_y" default="0.0"/>
   <arg name="initial_pose_a" default="0.0"/>
@@ -41,8 +42,8 @@
     <param name="odom_alpha2"               value="0.1"/>
     <param name="odom_alpha3"               value="0.1"/>
     <param name="odom_alpha4"               value="0.1"/>
-    <param name="odom_frame_id"             value="p_vbatista/odom"/>
-    <param name="base_frame_id"             value="p_vbatista/base_footprint"/>
+    <param name="odom_frame_id"             value="$(arg player_name)/odom"/>
+    <param name="base_frame_id"             value="$(arg player_name)/base_footprint"/>
 
   </node>
 </launch>

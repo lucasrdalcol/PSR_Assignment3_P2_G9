@@ -265,12 +265,19 @@ class Driver:
             points.append([x, y, z])
 
 
-
+        # to detect if we're near a wall, we use a loop that checks for an obstacle in a 0.7 range, in a 90 degree arch
+        # in front of the robot.
         wall_flag = False
-        for i in lidar_msg.ranges:
-            if i < 1.3:
-                wall_flag = True
+        for idx, i in enumerate(lidar_msg.ranges):
+            theta = lidar_msg.angle_min + lidar_msg.angle_increment * idx
+            if (i <0.7):
+                if (theta < math.pi/4 and theta > 0):
+                    wall_flag = True
+                elif (theta > 7*math.pi/4 and theta < 2*math.pi):
+                    wall_flag = True
 
+
+        #if the a wall is detected, we activate the state 'avoid_wall', otherwise, the state becomes None.
         if wall_flag == True:
             self.lidar_state = 'avoid_wall'
         else:
