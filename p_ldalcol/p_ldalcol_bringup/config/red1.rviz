@@ -15,7 +15,7 @@ Panels:
         - /Marker1
         - /Marker2
       Splitter Ratio: 0.5235294103622437
-    Tree Height: 514
+    Tree Height: 535
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -172,6 +172,78 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        blue1/base_footprint:
+          Value: true
+        blue1/base_link:
+          Value: true
+        blue1/base_scan:
+          Value: true
+        blue1/camera_link:
+          Value: true
+        blue1/camera_rgb_frame:
+          Value: true
+        blue1/camera_rgb_optical_frame:
+          Value: true
+        blue1/caster_back_left_link:
+          Value: true
+        blue1/caster_back_right_link:
+          Value: true
+        blue1/imu_link:
+          Value: true
+        blue1/odom:
+          Value: true
+        blue1/wheel_left_link:
+          Value: true
+        blue1/wheel_right_link:
+          Value: true
+        blue2/base_footprint:
+          Value: true
+        blue2/base_link:
+          Value: true
+        blue2/base_scan:
+          Value: true
+        blue2/camera_link:
+          Value: true
+        blue2/camera_rgb_frame:
+          Value: true
+        blue2/camera_rgb_optical_frame:
+          Value: true
+        blue2/caster_back_left_link:
+          Value: true
+        blue2/caster_back_right_link:
+          Value: true
+        blue2/imu_link:
+          Value: true
+        blue2/odom:
+          Value: true
+        blue2/wheel_left_link:
+          Value: true
+        blue2/wheel_right_link:
+          Value: true
+        blue3/base_footprint:
+          Value: true
+        blue3/base_link:
+          Value: true
+        blue3/base_scan:
+          Value: true
+        blue3/camera_link:
+          Value: true
+        blue3/camera_rgb_frame:
+          Value: true
+        blue3/camera_rgb_optical_frame:
+          Value: true
+        blue3/caster_back_left_link:
+          Value: true
+        blue3/caster_back_right_link:
+          Value: true
+        blue3/imu_link:
+          Value: true
+        blue3/odom:
+          Value: true
+        blue3/wheel_left_link:
+          Value: true
+        blue3/wheel_right_link:
+          Value: true
         green1/base_footprint:
           Value: true
         green1/base_link:
@@ -196,6 +268,54 @@ Visualization Manager:
           Value: true
         green1/wheel_right_link:
           Value: true
+        green2/base_footprint:
+          Value: true
+        green2/base_link:
+          Value: true
+        green2/base_scan:
+          Value: true
+        green2/camera_link:
+          Value: true
+        green2/camera_rgb_frame:
+          Value: true
+        green2/camera_rgb_optical_frame:
+          Value: true
+        green2/caster_back_left_link:
+          Value: true
+        green2/caster_back_right_link:
+          Value: true
+        green2/imu_link:
+          Value: true
+        green2/odom:
+          Value: true
+        green2/wheel_left_link:
+          Value: true
+        green2/wheel_right_link:
+          Value: true
+        green3/base_footprint:
+          Value: true
+        green3/base_link:
+          Value: true
+        green3/base_scan:
+          Value: true
+        green3/camera_link:
+          Value: true
+        green3/camera_rgb_frame:
+          Value: true
+        green3/camera_rgb_optical_frame:
+          Value: true
+        green3/caster_back_left_link:
+          Value: true
+        green3/caster_back_right_link:
+          Value: true
+        green3/imu_link:
+          Value: true
+        green3/odom:
+          Value: true
+        green3/wheel_left_link:
+          Value: true
+        green3/wheel_right_link:
+          Value: true
         red1/base_footprint:
           Value: true
         red1/base_link:
@@ -219,6 +339,54 @@ Visualization Manager:
         red1/wheel_left_link:
           Value: true
         red1/wheel_right_link:
+          Value: true
+        red2/base_footprint:
+          Value: true
+        red2/base_link:
+          Value: true
+        red2/base_scan:
+          Value: true
+        red2/camera_link:
+          Value: true
+        red2/camera_rgb_frame:
+          Value: true
+        red2/camera_rgb_optical_frame:
+          Value: true
+        red2/caster_back_left_link:
+          Value: true
+        red2/caster_back_right_link:
+          Value: true
+        red2/imu_link:
+          Value: true
+        red2/odom:
+          Value: true
+        red2/wheel_left_link:
+          Value: true
+        red2/wheel_right_link:
+          Value: true
+        red3/base_footprint:
+          Value: true
+        red3/base_link:
+          Value: true
+        red3/base_scan:
+          Value: true
+        red3/camera_link:
+          Value: true
+        red3/camera_rgb_frame:
+          Value: true
+        red3/camera_rgb_optical_frame:
+          Value: true
+        red3/caster_back_left_link:
+          Value: true
+        red3/caster_back_right_link:
+          Value: true
+        red3/imu_link:
+          Value: true
+        red3/odom:
+          Value: true
+        red3/wheel_left_link:
+          Value: true
+        red3/wheel_right_link:
           Value: true
       Marker Alpha: 1
       Marker Scale: 1
@@ -275,13 +443,13 @@ Visualization Manager:
       Unreliable: false
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: /red1/marker_array
       Name: MarkerArray
       Namespaces:
-        red1: true
+        {}
       Queue Size: 1
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /red1/text_marker
@@ -295,7 +463,7 @@ Visualization Manager:
       Marker Topic: /red1/cube_marker
       Name: Marker
       Namespaces:
-        red1: true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -326,7 +494,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.647960186004639
+      Distance: 0.2392634004354477
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -334,27 +502,27 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 8.36627197265625
-        Y: -1.8376544713974
-        Z: 2.9426345825195312
+        X: 5.61728572845459
+        Y: -2.6804275512695312
+        Z: 3.829266309738159
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.11479703336954117
+      Pitch: 0.44479694962501526
       Target Frame: <Fixed Frame>
-      Yaw: 5.3767571449279785
+      Yaw: 5.736756801605225
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1016
+  Height: 1043
   Hide Left Dock: false
   Hide Right Dock: true
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001560000035afc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000028d000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d00610067006501000002d0000000c70000001600ffffff000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007b80000003efc0100000002fb0000000800540069006d00650100000000000007b8000002eb00fffffffb0000000800540069006d006501000000000000045000000000000000000000065c0000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000015600000375fc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002a2000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d00610067006501000002e5000000cd0000001600ffffff000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000006240000037500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -363,6 +531,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: true
-  Width: 1976
-  X: 72
-  Y: 27
+  Width: 1920
+  X: 2048
+  Y: 0
