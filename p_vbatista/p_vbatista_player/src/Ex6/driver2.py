@@ -25,6 +25,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 class Driver:
     def __init__(self):
         # Define all variables
+
         self.biggest_area_green = None
         self.biggest_area_blue = None
         self.biggest_area_red = None
@@ -73,6 +74,7 @@ class Driver:
         self.lidar_state = None
         self.current_state = None
         self.distance_to_center_prey = 0
+        self.distance_to_center_prey2 = 0
         self.distance_to_center_hunter = 0
         self.signal = 1
 
@@ -318,26 +320,28 @@ class Driver:
             elif self.camera_state == 'waiting':
                 if self.biggest_centroid_blue2 is not None:
                     self.camera_state = 'escaping'
+                elif self.biggest_centroid_red2 is not None:
+                    self.camera_state = 'turn_to_hunt'
 
-        elif self.name in self.teams['green_team']:
-            if self.camera_state == 'hunting':
-                if self.biggest_centroid_red2 is not None and self.biggest_centroid_blue is not None:
-                    if self.biggest_area_red2 > self.biggest_area_blue:
-                        self.camera_state = 'escaping'
-
-            elif self.camera_state == 'waiting':
-                if self.biggest_centroid_red2 is not None:
-                    self.camera_state = 'escaping'
-
-        elif self.name in self.teams['blue_team']:
-            if self.camera_state == 'hunting':
-                if self.biggest_centroid_green2 is not None and self.biggest_centroid_red is not None:
-                    if self.biggest_area_green2 > self.biggest_area_red:
-                        self.camera_state = 'escaping'
-
-            elif self.camera_state == 'waiting':
-                if self.biggest_centroid_green2 is not None:
-                    self.camera_state = 'escaping'
+        # elif self.name in self.teams['green_team']:
+        #     if self.camera_state == 'hunting':
+        #         if self.biggest_centroid_red2 is not None and self.biggest_centroid_blue is not None:
+        #             if self.biggest_area_red2 > self.biggest_area_blue:
+        #                 self.camera_state = 'escaping'
+        #
+        #     elif self.camera_state == 'waiting':
+        #         if self.biggest_centroid_red2 is not None:
+        #             self.camera_state = 'escaping'
+        #
+        # elif self.name in self.teams['blue_team']:
+        #     if self.camera_state == 'hunting':
+        #         if self.biggest_centroid_green2 is not None and self.biggest_centroid_red is not None:
+        #             if self.biggest_area_green2 > self.biggest_area_red:
+        #                 self.camera_state = 'escaping'
+        #
+        #     elif self.camera_state == 'waiting':
+        #         if self.biggest_centroid_green2 is not None:
+        #             self.camera_state = 'escaping'
 
         # Annotate the closest players of my_team, my_preys and my_hunters
         if self.debug is True:
@@ -740,6 +744,27 @@ class Driver:
                         if self.debug:
                             print(
                                 Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
+
+                    elif self.camera_state == 'turn_to_hunt':
+                        if self.my_prey_color == 'red':
+                            self.distance_to_center_prey2 = round(self.biggest_centroid_red2[0]) - self.image_center
+                        elif self.my_prey_color == 'green':
+                            self.distance_to_center_prey2 = round(self.biggest_centroid_green2[0]) - self.image_center
+                        elif self.my_prey_color == 'blue':
+                            self.distance_to_center_prey2 = round(self.biggest_centroid_blue2[0]) - self.image_center
+
+                        if self.distance_to_center_prey2 >= 0:
+                            self.speed = 0.0
+                            self.angle = 2.0
+                        else:
+                            self.speed = 0.0
+                            self.angle = -2.0
+
+                        self.current_state = 'turn_to_hunt'
+                        if self.debug:
+                            print(
+                                Fore.RED + 'My name is ' + self.name + ' and I saw a prey with my back camera. Turning around to persue it.' + Fore.RESET)
+
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
