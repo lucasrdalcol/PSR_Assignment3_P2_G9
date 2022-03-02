@@ -1,0 +1,18 @@
+digraph G {
+"p_vbatista/base_footprint" -> "p_vbatista/base_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/odom" -> "p_vbatista/base_footprint"[label="Broadcaster: /gazebo\nAverage rate: 30.659 Hz\nMost recent transform: 1271.089 ( 0.018 sec old)\nBuffer length: 1.533 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/camera_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/camera_link" -> "p_vbatista/camera_rgb_frame"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/camera_rgb_frame" -> "p_vbatista/camera_rgb_optical_frame"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/caster_back_left_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/caster_back_right_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/imu_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/base_scan"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1271.107 sec old)\nBuffer length: 0.000 sec\n"];
+"p_vbatista/map" -> "p_vbatista/odom"[label="Broadcaster: /p_vbatista/mapping\nAverage rate: 20.667 Hz\nMost recent transform: 1271.112 ( -0.005 sec old)\nBuffer length: 1.500 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/wheel_left_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 30.659 Hz\nMost recent transform: 1271.089 ( 0.018 sec old)\nBuffer length: 1.533 sec\n"];
+"p_vbatista/base_link" -> "p_vbatista/wheel_right_link"[label="Broadcaster: /p_vbatista/robot_state_publisher\nAverage rate: 30.659 Hz\nMost recent transform: 1271.089 ( 0.018 sec old)\nBuffer length: 1.533 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1271.107"[ shape=plaintext ] ;
+ }->"p_vbatista/map";
+}
