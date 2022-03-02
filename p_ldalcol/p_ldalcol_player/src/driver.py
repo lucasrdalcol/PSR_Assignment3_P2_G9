@@ -40,7 +40,7 @@ class Driver:
         self.angle = 0
         self.speed = 0
         self.image_center = 427
-        self.debug = rospy.get_param('/debug')
+        self.debug = rospy.get_param('/' + self.name + '/debug')
         self.ranges_red = {'b': {'min': 0, 'max': 50},
                            'g': {'min': 0, 'max': 50},
                            'r': {'min': 100, 'max': 256}}
@@ -75,13 +75,13 @@ class Driver:
         self.publisher_command = rospy.Publisher('/' + self.name + '/cmd_vel', Twist, queue_size=1)
 
         # Initialize publisher of marker arrays
-        self.publisher_markers_spheres = rospy.Publisher('/' + self.name + '/marker_array', MarkerArray, queue_size=1)
+        self.publisher_markers_spheres = rospy.Publisher('/' + self.name + '/marker_array_spheres', MarkerArray, queue_size=1)
 
         # Initialize publisher of text marker
         self.publisher_text_marker = rospy.Publisher('/' + self.name + '/text_marker', Marker, queue_size=1)
 
         # Initialize publisher of cubes to represent the robots
-        self.publisher_cube_marker = rospy.Publisher('/' + self.name + '/cube_marker', Marker, queue_size=1)
+        self.publisher_cube_marker = rospy.Publisher('/' + self.name + '/marker_array_cubes', MarkerArray, queue_size=1)
 
         # Initialize tf2 buffer and listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -285,7 +285,7 @@ class Driver:
         else:
             self.lidar_state = None
 
-        # # option 2: with clustering
+        # # option 2: with clustering to exclude robots detection
         # # Check the close ranges between an angle of 40 degrees to the front of the robot
         # close_ranges = []
         #
@@ -321,11 +321,11 @@ class Driver:
         ############################
         # Clustering using markers
         ############################
-        thresh = 0.5
+        thresh = 0.4
 
-        marker_array = MarkerArray()
+        marker_array_spheres = MarkerArray()
         marker = self.createSphereMarker(0)
-        marker_array.markers.append(marker)
+        marker_array_spheres.markers.append(marker)
 
         for idx, (range1, range2) in enumerate(zip(lidar_msg.ranges[:-1], lidar_msg.ranges[1:])):
             if range1 < 0.1 or range2 < 0.1:
@@ -341,27 +341,37 @@ class Driver:
             x2 = range2 * math.cos(theta)
             y2 = range2 * math.sin(theta)
 
-            dist = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-            if dist > thresh:
-                marker = self.createSphereMarker(idx + 1)
-                marker_array.markers.append(marker)
+            dist = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
             point = Point(x=x1, y=y1, z=0)
-            last_marker = marker_array.markers[-1]
+            last_marker = marker_array_spheres.markers[-1]
             last_marker.points.append(point)
 
-        # for marker in marker_array.markers:
-        #     marker_points = marker.points
-        #     print(len(marker_points))
-        #     if len(marker_points) < 10:
-        #         robot_point = marker_points[0]
-        #         cube_marker = self.createCubeMarker(x=robot_point.x, y=robot_point.y)
-        #         self.publisher_cube_marker.publish(cube_marker)
-        # print(robot_point)
-        # print(robot_point.x)
+            if dist > thresh:
+                marker = self.createSphereMarker(idx + 1)
+                marker_array_spheres.markers.append(marker)
+
+        marker_array_cubes = MarkerArray()
+        for idx, marker in enumerate(marker_array_spheres.markers):
+            marker_points = marker.points
+            # print('idx ' + str(idx) + ': ' + str(len(marker_points)))
+            if self.camera_state == 'hunting':
+                if len(marker_points) <= 5 and len(marker_points) != 0:
+                    robot_point = marker_points[0]
+                    cube_marker = self.createCubeMarker(x=robot_point.x, y=robot_point.y, color=self.my_prey_color)
+                    marker_array_cubes.markers.append(cube_marker)
+            # elif self.camera_state == 'escaping':
+            #     if len(marker_points) <= 5 and len(marker_points) != 0:
+            #         robot_point = marker_points[0]
+            #         cube_marker = self.createCubeMarker(x=robot_point.x, y=robot_point.y, color=self.my_hunter_color)
+            #         marker_array_cubes.markers.append(cube_marker)
 
         # print(len(marker_array.markers))
-        self.publisher_markers_spheres.publish(marker_array)
+        self.publisher_cube_marker.publish(marker_array_cubes)
+        self.publisher_markers_spheres.publish(marker_array_spheres)
+
+        marker_array_spheres.markers.clear()
+        marker_array_cubes.markers.clear()
         # rospy.loginfo('Published clustered laser scan messages')
 
     def createSphereMarker(self, id):
@@ -408,7 +418,7 @@ class Driver:
 
         return marker_text
 
-    def createCubeMarker(self, x, y):
+    def createCubeMarker(self, x, y, color):
         # Cube
         marker_cube = Marker()
         marker_cube.header.frame_id = self.name + '/base_scan'
@@ -422,13 +432,22 @@ class Driver:
         marker_cube.pose.orientation.y = 0.0
         marker_cube.pose.orientation.z = 0.0
         marker_cube.pose.orientation.w = 1.0
-        marker_cube.scale.x = 0.1
-        marker_cube.scale.y = 0.1
-        marker_cube.scale.z = 0.1
+        marker_cube.scale.x = 0.2
+        marker_cube.scale.y = 0.2
+        marker_cube.scale.z = 0.2
         marker_cube.color.a = 1.0  # Don't forget to set the alpha!
-        marker_cube.color.r = 1.0
-        marker_cube.color.g = 0.0
-        marker_cube.color.b = 0.0
+        if color == 'red':
+            marker_cube.color.r = 1.0
+            marker_cube.color.g = 0.0
+            marker_cube.color.b = 0.0
+        elif color == 'green':
+            marker_cube.color.r = 0.0
+            marker_cube.color.g = 1.0
+            marker_cube.color.b = 0.0
+        elif color == 'blue':
+            marker_cube.color.r = 0.0
+            marker_cube.color.g = 0.0
+            marker_cube.color.b = 1.0
 
         return marker_cube
 

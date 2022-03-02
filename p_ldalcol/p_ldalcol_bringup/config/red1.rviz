@@ -13,7 +13,7 @@ Panels:
         - /Pose1
         - /MarkerArray1
         - /Marker1
-        - /Marker2
+        - /MarkerArray2
       Splitter Ratio: 0.5235294103622437
     Tree Height: 535
   - Class: rviz/Selection
@@ -196,54 +196,6 @@ Visualization Manager:
           Value: true
         blue1/wheel_right_link:
           Value: true
-        blue2/base_footprint:
-          Value: true
-        blue2/base_link:
-          Value: true
-        blue2/base_scan:
-          Value: true
-        blue2/camera_link:
-          Value: true
-        blue2/camera_rgb_frame:
-          Value: true
-        blue2/camera_rgb_optical_frame:
-          Value: true
-        blue2/caster_back_left_link:
-          Value: true
-        blue2/caster_back_right_link:
-          Value: true
-        blue2/imu_link:
-          Value: true
-        blue2/odom:
-          Value: true
-        blue2/wheel_left_link:
-          Value: true
-        blue2/wheel_right_link:
-          Value: true
-        blue3/base_footprint:
-          Value: true
-        blue3/base_link:
-          Value: true
-        blue3/base_scan:
-          Value: true
-        blue3/camera_link:
-          Value: true
-        blue3/camera_rgb_frame:
-          Value: true
-        blue3/camera_rgb_optical_frame:
-          Value: true
-        blue3/caster_back_left_link:
-          Value: true
-        blue3/caster_back_right_link:
-          Value: true
-        blue3/imu_link:
-          Value: true
-        blue3/odom:
-          Value: true
-        blue3/wheel_left_link:
-          Value: true
-        blue3/wheel_right_link:
-          Value: true
         green1/base_footprint:
           Value: true
         green1/base_link:
@@ -268,54 +220,6 @@ Visualization Manager:
           Value: true
         green1/wheel_right_link:
           Value: true
-        green2/base_footprint:
-          Value: true
-        green2/base_link:
-          Value: true
-        green2/base_scan:
-          Value: true
-        green2/camera_link:
-          Value: true
-        green2/camera_rgb_frame:
-          Value: true
-        green2/camera_rgb_optical_frame:
-          Value: true
-        green2/caster_back_left_link:
-          Value: true
-        green2/caster_back_right_link:
-          Value: true
-        green2/imu_link:
-          Value: true
-        green2/odom:
-          Value: true
-        green2/wheel_left_link:
-          Value: true
-        green2/wheel_right_link:
-          Value: true
-        green3/base_footprint:
-          Value: true
-        green3/base_link:
-          Value: true
-        green3/base_scan:
-          Value: true
-        green3/camera_link:
-          Value: true
-        green3/camera_rgb_frame:
-          Value: true
-        green3/camera_rgb_optical_frame:
-          Value: true
-        green3/caster_back_left_link:
-          Value: true
-        green3/caster_back_right_link:
-          Value: true
-        green3/imu_link:
-          Value: true
-        green3/odom:
-          Value: true
-        green3/wheel_left_link:
-          Value: true
-        green3/wheel_right_link:
-          Value: true
         red1/base_footprint:
           Value: true
         red1/base_link:
@@ -339,54 +243,6 @@ Visualization Manager:
         red1/wheel_left_link:
           Value: true
         red1/wheel_right_link:
-          Value: true
-        red2/base_footprint:
-          Value: true
-        red2/base_link:
-          Value: true
-        red2/base_scan:
-          Value: true
-        red2/camera_link:
-          Value: true
-        red2/camera_rgb_frame:
-          Value: true
-        red2/camera_rgb_optical_frame:
-          Value: true
-        red2/caster_back_left_link:
-          Value: true
-        red2/caster_back_right_link:
-          Value: true
-        red2/imu_link:
-          Value: true
-        red2/odom:
-          Value: true
-        red2/wheel_left_link:
-          Value: true
-        red2/wheel_right_link:
-          Value: true
-        red3/base_footprint:
-          Value: true
-        red3/base_link:
-          Value: true
-        red3/base_scan:
-          Value: true
-        red3/camera_link:
-          Value: true
-        red3/camera_rgb_frame:
-          Value: true
-        red3/camera_rgb_optical_frame:
-          Value: true
-        red3/caster_back_left_link:
-          Value: true
-        red3/caster_back_right_link:
-          Value: true
-        red3/imu_link:
-          Value: true
-        red3/odom:
-          Value: true
-        red3/wheel_left_link:
-          Value: true
-        red3/wheel_right_link:
           Value: true
       Marker Alpha: 1
       Marker Scale: 1
@@ -444,7 +300,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: false
-      Marker Topic: /red1/marker_array
+      Marker Topic: /red1/marker_array_spheres
       Name: MarkerArray
       Namespaces:
         {}
@@ -458,10 +314,10 @@ Visualization Manager:
         red1: true
       Queue Size: 100
       Value: true
-    - Class: rviz/Marker
+    - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /red1/cube_marker
-      Name: Marker
+      Marker Topic: /red1/marker_array_cubes
+      Name: MarkerArray
       Namespaces:
         {}
       Queue Size: 100
@@ -494,7 +350,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.2392634004354477
+      Distance: 3.660231590270996
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -502,17 +358,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 5.61728572845459
-        Y: -2.6804275512695312
-        Z: 3.829266309738159
+        X: 5.354088306427002
+        Y: -2.457787275314331
+        Z: 4.3110527992248535
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.44479694962501526
+      Pitch: 0.854796826839447
       Target Frame: <Fixed Frame>
-      Yaw: 5.736756801605225
+      Yaw: 5.6867570877075195
     Saved: ~
 Window Geometry:
   Displays:
