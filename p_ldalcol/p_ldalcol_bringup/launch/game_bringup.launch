@@ -16,29 +16,29 @@
         <arg name="teleop" default="false"/>
     </include>
 
-<!--    &lt;!&ndash;    red2&ndash;&gt;-->
-<!--    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">-->
-<!--        <arg name="player_name" default="red2"/>-->
-<!--        <arg name="player_color" default="Red"/>-->
-<!--        <arg name="x_pos" default="6.0"/>-->
-<!--        <arg name="y_pos" default="5.0"/>-->
-<!--        <arg name="z_pos" default="0.0"/>-->
-<!--        <arg name="visualize" default="false"/>-->
-<!--        <arg name="driver" default="true"/>-->
-<!--        <arg name="teleop" default="false"/>-->
-<!--    </include>-->
+    <!--    red2-->
+    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">
+        <arg name="player_name" default="red2"/>
+        <arg name="player_color" default="Red"/>
+        <arg name="x_pos" default="6.0"/>
+        <arg name="y_pos" default="5.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="false"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
+    </include>
 
-<!--    &lt;!&ndash;    red3&ndash;&gt;-->
-<!--    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">-->
-<!--        <arg name="player_name" default="red3"/>-->
-<!--        <arg name="player_color" default="Red"/>-->
-<!--        <arg name="x_pos" default="7.0"/>-->
-<!--        <arg name="y_pos" default="5.0"/>-->
-<!--        <arg name="z_pos" default="0.0"/>-->
-<!--        <arg name="visualize" default="false"/>-->
-<!--        <arg name="driver" default="true"/>-->
-<!--        <arg name="teleop" default="false"/>-->
-<!--    </include>-->
+    <!--    red3-->
+    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">
+        <arg name="player_name" default="red3"/>
+        <arg name="player_color" default="Red"/>
+        <arg name="x_pos" default="7.0"/>
+        <arg name="y_pos" default="5.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="false"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
+    </include>
 
 
     <!--    GREEN TEAM-->
@@ -50,33 +50,33 @@
         <arg name="y_pos" default="5.0"/>
         <arg name="z_pos" default="0.0"/>
         <arg name="visualize" default="false"/>
-        <arg name="driver" default="false"/>
+        <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
     </include>
 
-<!--    &lt;!&ndash;    green2&ndash;&gt;-->
-<!--    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">-->
-<!--        <arg name="player_name" default="green2"/>-->
-<!--        <arg name="player_color" default="Green"/>-->
-<!--        <arg name="x_pos" default="-6.0"/>-->
-<!--        <arg name="y_pos" default="5.0"/>-->
-<!--        <arg name="z_pos" default="0.0"/>-->
-<!--        <arg name="visualize" default="false"/>-->
-<!--        <arg name="driver" default="true"/>-->
-<!--        <arg name="teleop" default="false"/>-->
-<!--    </include>-->
+    <!--    green2-->
+    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">
+        <arg name="player_name" default="green2"/>
+        <arg name="player_color" default="Green"/>
+        <arg name="x_pos" default="-6.0"/>
+        <arg name="y_pos" default="5.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="false"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
+    </include>
 
-<!--    &lt;!&ndash;    green3&ndash;&gt;-->
-<!--    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">-->
-<!--        <arg name="player_name" default="green3"/>-->
-<!--        <arg name="player_color" default="Green"/>-->
-<!--        <arg name="x_pos" default="-7.0"/>-->
-<!--        <arg name="y_pos" default="5.0"/>-->
-<!--        <arg name="z_pos" default="0.0"/>-->
-<!--        <arg name="visualize" default="false"/>-->
-<!--        <arg name="driver" default="true"/>-->
-<!--        <arg name="teleop" default="false"/>-->
-<!--    </include>-->
+    <!--    green3-->
+    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">
+        <arg name="player_name" default="green3"/>
+        <arg name="player_color" default="Green"/>
+        <arg name="x_pos" default="-7.0"/>
+        <arg name="y_pos" default="5.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="false"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
+    </include>
 
     <!--    BLUE TEAM-->
     <!--    blue1-->
@@ -87,33 +87,33 @@
         <arg name="y_pos" default="-1.0"/>
         <arg name="z_pos" default="0.0"/>
         <arg name="visualize" default="false"/>
-        <arg name="driver" default="false"/>
+        <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
     </include>
 
-<!--    &lt;!&ndash;    blue2&ndash;&gt;-->
-<!--    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">-->
-<!--        <arg name="player_name" default="blue2"/>-->
-<!--        <arg name="player_color" default="Blue"/>-->
-<!--        <arg name="x_pos" default="1.0"/>-->
-<!--        <arg name="y_pos" default="-1.0"/>-->
-<!--        <arg name="z_pos" default="0.0"/>-->
-<!--        <arg name="visualize" default="false"/>-->
-<!--        <arg name="driver" default="true"/>-->
-<!--        <arg name="teleop" default="false"/>-->
-<!--    </include>-->
+    <!--    blue2-->
+    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">
+        <arg name="player_name" default="blue2"/>
+        <arg name="player_color" default="Blue"/>
+        <arg name="x_pos" default="1.0"/>
+        <arg name="y_pos" default="-1.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="false"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
+    </include>
 
-<!--    &lt;!&ndash;    blue3&ndash;&gt;-->
-<!--    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">-->
-<!--        <arg name="player_name" default="blue3"/>-->
-<!--        <arg name="player_color" default="Blue"/>-->
-<!--        <arg name="x_pos" default="-1.0"/>-->
-<!--        <arg name="y_pos" default="-1.0"/>-->
-<!--        <arg name="z_pos" default="0.0"/>-->
-<!--        <arg name="visualize" default="false"/>-->
-<!--        <arg name="driver" default="true"/>-->
-<!--        <arg name="teleop" default="false"/>-->
-<!--    </include>-->
+    <!--    blue3-->
+    <include file="$(find p_ldalcol_bringup)/launch/bringup.launch">
+        <arg name="player_name" default="blue3"/>
+        <arg name="player_color" default="Blue"/>
+        <arg name="x_pos" default="-1.0"/>
+        <arg name="y_pos" default="-1.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="false"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
+    </include>
 
 <!--    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>-->
 
