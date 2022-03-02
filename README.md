@@ -43,8 +43,8 @@ To start the game, enter the following command in the terminal:
 rosrun th_referee th_referee
 ```
 
-### Controling the Robot
-TODO
+### Driver Intelligences
+We developed two intelligences to drive the robots: one of them for a robot with one camera and the other with two cameras.
 
 
 
