@@ -13,12 +13,14 @@ import rospy
 import tf2_ros
 from colorama import Fore
 from cv_bridge import CvBridge, CvBridgeError
+from gazebo_msgs.msg import ContactsState
 from std_msgs.msg import String
 from psr_parte09_exs.msg import Dog
 from geometry_msgs.msg import Twist
 from tf2_geometry_msgs import PoseStamped
 from sensor_msgs.msg import Image, LaserScan
 import std_msgs.msg
+from visualization_msgs.msg import Marker, MarkerArray
 
 
 class Driver:
@@ -38,7 +40,7 @@ class Driver:
         self.angle = 0
         self.speed = 0
         self.image_center = 427
-        self.debug = rospy.get_param('/debug')
+        self.debug = rospy.get_param('/' + self.name + '/debug')
         self.ranges_red = {'b': {'min': 0, 'max': 50},
                            'g': {'min': 0, 'max': 50},
                            'r': {'min': 100, 'max': 256}}
@@ -62,13 +64,24 @@ class Driver:
             [self.ranges_blue['b']['max'], self.ranges_blue['g']['max'], self.ranges_blue['r']['max']])
         # You need to choose 4 or 8 for connectivity type
         self.connectivity = 4
-        self.state = 'waiting'
+        self.camera_state = 'waiting'
         self.lidar_state = None
-        self.distance_to_center = 0
+        self.current_state = None
+        self.distance_to_center_prey = 0
+        self.distance_to_center_hunter = 0
         self.signal = 1
 
         # Initialize publisher
         self.publisher_command = rospy.Publisher('/' + self.name + '/cmd_vel', Twist, queue_size=1)
+
+        # Initialize publisher of marker arrays
+        self.publisher_markers_spheres = rospy.Publisher('/' + self.name + '/marker_array_spheres', MarkerArray, queue_size=1)
+
+        # Initialize publisher of text marker
+        self.publisher_text_marker = rospy.Publisher('/' + self.name + '/text_marker', Marker, queue_size=1)
+
+        # Initialize publisher of cubes to represent the robots
+        self.publisher_cube_marker = rospy.Publisher('/' + self.name + '/marker_array_cubes', MarkerArray, queue_size=1)
 
         # Initialize tf2 buffer and listener
         self.tf_buffer = tf2_ros.Buffer()
@@ -156,22 +169,22 @@ class Driver:
                 # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
                 # the closest the prey or the hunter are.
                 if self.biggest_area_green > self.biggest_area_blue:
-                    self.state = 'hunting'
+                    self.camera_state = 'hunting'
                 else:
-                    self.state = 'escaping'
+                    self.camera_state = 'escaping'
 
             # Check if there is only hunter or prey detected.
             elif self.biggest_centroid_green is not None or self.biggest_centroid_blue is not None:
                 # Activate hunting mode
                 if self.biggest_centroid_green is not None:
-                    self.state = 'hunting'
+                    self.camera_state = 'hunting'
                 # Activate escape mode
                 elif self.biggest_centroid_blue is not None:
-                    self.state = 'escaping'
+                    self.camera_state = 'escaping'
 
             # If there is no hunter or prey detected, active waiting mode.
             else:
-                self.state = 'waiting'
+                self.camera_state = 'waiting'
 
         elif self.name in self.teams['green_team']:
             # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
@@ -179,22 +192,22 @@ class Driver:
                 # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
                 # the closest the prey or the hunter are.
                 if self.biggest_area_blue > self.biggest_area_red:
-                    self.state = 'hunting'
+                    self.camera_state = 'hunting'
                 else:
-                    self.state = 'escaping'
+                    self.camera_state = 'escaping'
 
             # Check if there is only hunter or prey detected.
             elif self.biggest_centroid_blue is not None or self.biggest_centroid_red is not None:
                 # Activate hunting mode
                 if self.biggest_centroid_blue is not None:
-                    self.state = 'hunting'
+                    self.camera_state = 'hunting'
                 # Activate escape mode
                 elif self.biggest_centroid_red is not None:
-                    self.state = 'escaping'
+                    self.camera_state = 'escaping'
 
             # If there is no hunter or prey detected, active waiting mode.
             else:
-                self.state = 'waiting'
+                self.camera_state = 'waiting'
 
         elif self.name in self.teams['blue_team']:
             # If hunter and prey are detected at the same time, it should be decided which mode will be activated.
@@ -202,22 +215,22 @@ class Driver:
                 # If green blob is bigger, activate hunting mode. If not, activate escaping mode. The bigger the blob,
                 # the closest the prey or the hunter are.
                 if self.biggest_area_red > self.biggest_area_green:
-                    self.state = 'hunting'
+                    self.camera_state = 'hunting'
                 else:
-                    self.state = 'escaping'
+                    self.camera_state = 'escaping'
 
             # Check if there is only hunter or prey detected.
             elif self.biggest_centroid_red is not None or self.biggest_centroid_green is not None:
                 # Activate hunting mode
                 if self.biggest_centroid_red is not None:
-                    self.state = 'hunting'
+                    self.camera_state = 'hunting'
                 # Activate escape mode
                 elif self.biggest_centroid_green is not None:
-                    self.state = 'escaping'
+                    self.camera_state = 'escaping'
 
             # If there is no hunter or prey detected, active waiting mode.
             else:
-                self.state = 'waiting'
+                self.camera_state = 'waiting'
 
         # Annotate the closest players of my_team, my_preys and my_hunters
         if self.debug is True:
@@ -253,22 +266,186 @@ class Driver:
             cv2.waitKey(1)
 
     def detectWallsWithLidarCallback(self, lidar_msg):
-        # convert from polar coordinates to cartesian
-        points = []
-        z = 0
 
-        for idx, range in enumerate(lidar_msg.ranges):
-            theta = lidar_msg.angle_min + lidar_msg.angle_increment * idx
-            x = range * math.cos(theta)
-            y = range * math.sin(theta)
+        # Option 1: without clustering for the robots.
+        close_ranges = []
 
-            points.append([x, y, z])
+        # Check the close ranges between an angle of 40 degrees to the front of the robot
+        for range in lidar_msg.ranges[0:20]:
+            close_ranges.append(range)
+        for range in lidar_msg.ranges[340:360]:
+            close_ranges.append(range)
 
-        if lidar_msg.ranges[0] < 1.0:
-            self.lidar_state = 'avoid_wall'
+        if any(range < 0.6 for range in close_ranges):
+            self.lidar_state = 'avoid_obstacle'
         else:
             self.lidar_state = None
 
+        # # option 2: with clustering to exclude robots detection
+        # # Check the close ranges between an angle of 40 degrees to the front of the robot
+        # close_ranges = []
+        #
+        # for range in lidar_msg.ranges[340:360]:
+        #     close_ranges.append(range)
+        #
+        # for range in lidar_msg.ranges[0:20]:
+        #     close_ranges.append(range)
+        #
+        # # Cluster the vision within this 40 degrees to ignore other robots, but not the walls.
+        # cluster = {0: []}
+        # cluster_idx = 0
+        # for idx, (range1, range2) in enumerate(zip(close_ranges[:-1], close_ranges[1:])):
+        #     diff = abs(range2 - range1)
+        #     cluster[cluster_idx].append(range1)
+        #     if diff > 0.4:
+        #         cluster_idx += 1
+        #         cluster[cluster_idx] = []
+        #
+        # # Exclude robots detections
+        # for cluster_key, cluster_value in cluster.items():
+        #     if len(cluster_value) <= 3:
+        #         cluster_value.clear()
+        #
+        # print(cluster)
+        #
+        # for close_ranges in cluster.values():
+        #     if any(range < 0.8 for range in close_ranges):
+        #         self.lidar_state = 'avoid_obstacle'
+        #     else:
+        #         self.lidar_state = None
+
+        ############################
+        # Clustering using markers
+        ############################
+        thresh = 0.4
+
+        marker_array_spheres = MarkerArray()
+        marker = self.createSphereMarker(0)
+        marker_array_spheres.markers.append(marker)
+
+        for idx, (range1, range2) in enumerate(zip(lidar_msg.ranges[:-1], lidar_msg.ranges[1:])):
+            if range1 < 0.1 or range2 < 0.1:
+                continue
+            if range1 > 50 or range2 > 50:
+                continue
+
+            theta = lidar_msg.angle_min + lidar_msg.angle_increment * idx
+            x1 = range1 * math.cos(theta)
+            y1 = range1 * math.sin(theta)
+
+            theta = theta + lidar_msg.angle_increment
+            x2 = range2 * math.cos(theta)
+            y2 = range2 * math.sin(theta)
+
+            dist = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+            point = Point(x=x1, y=y1, z=0)
+            last_marker = marker_array_spheres.markers[-1]
+            last_marker.points.append(point)
+
+            if dist > thresh:
+                marker = self.createSphereMarker(idx + 1)
+                marker_array_spheres.markers.append(marker)
+
+        marker_array_cubes = MarkerArray()
+        for idx, marker in enumerate(marker_array_spheres.markers):
+            marker_points = marker.points
+            # print('idx ' + str(idx) + ': ' + str(len(marker_points)))
+            if self.camera_state == 'hunting':
+                if len(marker_points) <= 5 and len(marker_points) != 0:
+                    robot_point = marker_points[0]
+                    cube_marker = self.createCubeMarker(x=robot_point.x, y=robot_point.y, color=self.my_prey_color)
+                    marker_array_cubes.markers.append(cube_marker)
+            # elif self.camera_state == 'escaping':
+            #     if len(marker_points) <= 5 and len(marker_points) != 0:
+            #         robot_point = marker_points[0]
+            #         cube_marker = self.createCubeMarker(x=robot_point.x, y=robot_point.y, color=self.my_hunter_color)
+            #         marker_array_cubes.markers.append(cube_marker)
+
+        # print(len(marker_array.markers))
+        self.publisher_cube_marker.publish(marker_array_cubes)
+        self.publisher_markers_spheres.publish(marker_array_spheres)
+
+        marker_array_spheres.markers.clear()
+        marker_array_cubes.markers.clear()
+        # rospy.loginfo('Published clustered laser scan messages')
+
+    def createSphereMarker(self, id):
+        marker_sphere = Marker()
+        marker_sphere.header.frame_id = self.name + '/base_scan'
+        marker_sphere.ns = self.name
+        marker_sphere.id = id
+        marker_sphere.type = marker_sphere.SPHERE_LIST
+        marker_sphere.action = marker_sphere.ADD
+        marker_sphere.pose.position.x = 0
+        marker_sphere.pose.position.y = 0
+        marker_sphere.pose.position.z = 0
+        marker_sphere.pose.orientation.w = 1.0
+        marker_sphere.color.r = random.random()
+        marker_sphere.color.g = random.random()
+        marker_sphere.color.b = random.random()
+        marker_sphere.color.a = 1.0  # Don't forget to set the alpha!
+        marker_sphere.scale.x = 0.1
+        marker_sphere.scale.y = 0.1
+        marker_sphere.scale.z = 0.1
+
+        return marker_sphere
+
+    def createTextMarker(self, text):
+        # Text
+        marker_text = Marker()
+        marker_text.header.frame_id = self.name + '/base_scan'
+        marker_text.ns = self.name
+        marker_text.text = text
+        marker_text.type = marker_text.TEXT_VIEW_FACING
+        marker_text.action = marker_text.ADD
+        marker_text.pose.position.x = 0
+        marker_text.pose.position.y = 0
+        marker_text.pose.position.z = 0.5
+        marker_text.pose.orientation.x = 0.0
+        marker_text.pose.orientation.y = 0.0
+        marker_text.pose.orientation.z = 0.0
+        marker_text.pose.orientation.w = 1.0
+        marker_text.scale.z = 0.2
+        marker_text.color.a = 1.0  # Don't forget to set the alpha!
+        marker_text.color.r = 0.0
+        marker_text.color.g = 0.0
+        marker_text.color.b = 0.0
+
+        return marker_text
+
+    def createCubeMarker(self, x, y, color):
+        # Cube
+        marker_cube = Marker()
+        marker_cube.header.frame_id = self.name + '/base_scan'
+        marker_cube.ns = self.name
+        marker_cube.type = marker_cube.CUBE
+        marker_cube.action = marker_cube.ADD
+        marker_cube.pose.position.x = x
+        marker_cube.pose.position.y = y
+        marker_cube.pose.position.z = 0
+        marker_cube.pose.orientation.x = 0.0
+        marker_cube.pose.orientation.y = 0.0
+        marker_cube.pose.orientation.z = 0.0
+        marker_cube.pose.orientation.w = 1.0
+        marker_cube.scale.x = 0.2
+        marker_cube.scale.y = 0.2
+        marker_cube.scale.z = 0.2
+        marker_cube.color.a = 1.0  # Don't forget to set the alpha!
+        if color == 'red':
+            marker_cube.color.r = 1.0
+            marker_cube.color.g = 0.0
+            marker_cube.color.b = 0.0
+        elif color == 'green':
+            marker_cube.color.r = 0.0
+            marker_cube.color.g = 1.0
+            marker_cube.color.b = 0.0
+        elif color == 'blue':
+            marker_cube.color.r = 0.0
+            marker_cube.color.g = 0.0
+            marker_cube.color.b = 1.0
+
+        return marker_cube
     def findCentroid(self, mask_original):
         """
         Create a mask with the largest blob of mask_original and return its centroid coordinates
@@ -389,54 +566,70 @@ class Driver:
         # Check if the goal pose is active or not
         if self.goal_active:
             self.driveStraight()
-            if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
-                self.speed = 0.2
+            if self.lidar_state == 'avoid_obstacle':  # Avoid wall prevails
+                self.speed = -0.2
                 self.angle = self.signal * 2.0
                 # if self.debug:
-                print(
-                    Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
+                self.current_state = 'avoid_obstacle'
+
+                if self.debug:
+                    print(Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
             else:
                 self.signal = random.choice(signals_list)
-                print(
-                    Fore.GREEN + 'My name is ' + self.name + ' and I am going to the goal pose.' + Fore.RESET)
+                self.current_state = 'goal_active'
+
+                if self.debug:
+                    print(Fore.GREEN + 'My name is ' + self.name + ' and I am going to the goal pose.' + Fore.RESET)
 
         else:  # If there is no goal, play the game.
-            if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams['blue_team']:
-                # If there is a prey detected, pursue prey
-                if self.lidar_state == 'avoid_wall':  # Avoid wall prevails
-                    self.speed = 0.2
-                    self.angle = self.signal * 2.0
-                    # if self.debug:
-                    print(Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
-                else:
-                    if self.state == 'waiting':
-                        self.signal = random.choice(signals_list)
-                        if self.distance_to_center >= 0:
-                            # self.speed = 0
-                            self.speed = 0.3
-                            # self.angle = -0.5  # rotate to right
-                            self.angle = 0  # rotate to right
+            if self.name in self.teams['red_team'] or self.name in self.teams['green_team'] or self.name in self.teams[
+                'blue_team']:
+                if self.lidar_state == 'avoid_obstacle':  # Avoid wall prevails
+                    if not self.camera_state == 'hunting':  # If the hunting mode is on, the lidar is detecting a robot prey
+                        if self.distance_to_center_prey >= 0:
+                            self.speed = -0.2
+                            self.angle = 1.5
                         else:
-                            # self.speed = 0
-                            self.speed = 0.3
-                            # self.angle = 0.5  # rotate to left
-                            self.angle = 0  # rotate to left
+                            self.speed = -0.2
+                            self.angle = -1.5
 
-                        # if self.debug:
-                        print(
-                            Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+                        self.current_state = 'avoid_obstacle'
+                        if self.debug:
+                            print(
+                                Fore.RED + 'My name is ' + self.name + ' and I am too close to the wall. Avoiding it.' + Fore.RESET)
+                else:
+                    if self.camera_state == 'waiting':
+                        if self.distance_to_center_prey > 350:
+                            self.speed = 0.1
+                            self.angle = -0.5
+                        elif self.distance_to_center_prey < -350:
+                            self.speed = 0.1
+                            self.angle = 0.5
+                        else:
+                            self.speed = 0.4
+                            self.angle = 0
 
-                    elif self.state == 'hunting':
+                        self.current_state = 'waiting'
+                        if self.debug:
+                            print(
+                                Fore.BLUE + 'My name is ' + self.name + ' and I am waiting for my next prey!!!' + Fore.RESET)
+
+                    elif self.camera_state == 'hunting':
                         self.pursuePrey(self.my_prey_color)
-                        # if self.debug:
-                        print(
-                            Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
 
-                    elif self.state == 'escaping':
+                        self.current_state = 'hunting'
+                        if self.debug:
+                            print(
+                                Fore.GREEN + 'My name is ' + self.name + ' and I am hunting a ' + self.my_prey_color + ' player now!!!' + Fore.RESET)
+
+                    elif self.camera_state == 'escaping':
+                        self.distance_to_center_prey = 0
                         self.escapeHunter(self.my_hunter_color)
-                        # if self.debug:
-                        print(
-                            Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
+
+                        self.current_state = 'escaping'
+                        if self.debug:
+                            print(
+                                Fore.RED + 'My name is ' + self.name + ' and I have to escape from a ' + self.my_hunter_color + ' player now!!!' + Fore.RESET)
 
         # Construct the twist message for the robot with the speed and angle needed
         twist = Twist()
@@ -446,9 +639,9 @@ class Driver:
         # Publish the twist command to the robot
         self.publisher_command.publish(twist)
 
-        # # If there is a hunter, escape from him for 2 seconds to maintain the speed and angle commands.
-        # if self.state == 'escaping':
-        #     rospy.sleep(5)
+        # Publish the current state text marker
+        text_marker = self.createTextMarker(self.current_state)
+        self.publisher_text_marker.publish(text_marker)
 
     def driveStraight(self, minimum_speed=0.1, maximum_speed=0.3):
         """
@@ -493,11 +686,11 @@ class Driver:
                 self.speed = max(minimum_speed, self.biggest_area_red / 10000)  # limit minimum speed
                 self.speed = min(maximum_speed, self.speed)  # limit maximum speed
 
-                self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
-                if self.distance_to_center > 0:  # turn right
-                    self.angle = -0.4
-                elif self.distance_to_center < 0:  # turn left
-                    self.angle = 0.4
+                self.distance_to_center_prey = round(self.biggest_centroid_red[0]) - self.image_center
+                if self.distance_to_center_prey > 0:  # turn right
+                    self.angle = -self.distance_to_center_prey / 600
+                elif self.distance_to_center_prey < 0:  # turn left
+                    self.angle = -self.distance_to_center_prey / 600
                 else:  # go straight away to the prey
                     self.angle = 0
 
@@ -506,11 +699,11 @@ class Driver:
                 self.speed = max(minimum_speed, self.biggest_area_green / 10000)  # limit minimum speed
                 self.speed = min(maximum_speed, self.speed)  # limit maximum speed
 
-                self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
-                if self.distance_to_center > 0:  # turn right
-                    self.angle = -0.4
-                elif self.distance_to_center < 0:  # turn left
-                    self.angle = 0.4
+                self.distance_to_center_prey = round(self.biggest_centroid_green[0]) - self.image_center
+                if self.distance_to_center_prey > 0:  # turn right
+                    self.angle = -self.distance_to_center_prey / 600
+                elif self.distance_to_center_prey < 0:  # turn left
+                    self.angle = -self.distance_to_center_prey / 600
                 else:  # go straight away to the prey
                     self.angle = 0
 
@@ -519,15 +712,15 @@ class Driver:
                 self.speed = max(minimum_speed, self.biggest_area_blue / 10000)  # limit minimum speed
                 self.speed = min(maximum_speed, self.speed)  # limit maximum speed
 
-                self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
-                if self.distance_to_center > 0:  # turn right
-                    self.angle = -0.4
-                elif self.distance_to_center < 0:  # turn left
-                    self.angle = 0.4
+                self.distance_to_center_prey = round(self.biggest_centroid_blue[0]) - self.image_center
+                if self.distance_to_center_prey > 0:  # turn right
+                    self.angle = -self.distance_to_center_prey / 600
+                elif self.distance_to_center_prey < 0:  # turn left
+                    self.angle = -self.distance_to_center_prey / 600
                 else:  # go straight away to the prey
                     self.angle = 0
 
-    def escapeHunter(self, my_hunter_color, minimum_speed=0.3, maximum_speed=0.6):
+    def escapeHunter(self, my_hunter_color, maximum_speed=0.6):
         """
         Function that receives the goal pose and calculate the speed and angle to drive to that goal.
         :param minimum_speed:
@@ -537,26 +730,26 @@ class Driver:
 
         if my_hunter_color == 'red':
             if self.biggest_centroid_red is not None:
-                self.distance_to_center = round(self.biggest_centroid_red[0]) - self.image_center
-                if self.distance_to_center > 0:  # turn left, to the opposite direction
+                self.istance_to_center_hunter = round(self.biggest_centroid_red[0]) - self.image_center
+                if self.distance_to_center_hunter > 0:  # turn left, to the opposite direction
                     self.angle = 0.6
-                elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                elif self.distance_to_center_hunter < 0:  # turn right, to the opposite direction
                     self.angle = -0.6
 
         elif my_hunter_color == 'green':
             if self.biggest_centroid_green is not None:
-                self.distance_to_center = round(self.biggest_centroid_green[0]) - self.image_center
-                if self.distance_to_center > 0:  # turn left, to the opposite direction
+                self.distance_to_center_hunter = round(self.biggest_centroid_green[0]) - self.image_center
+                if self.distance_to_center_hunter > 0:  # turn left, to the opposite direction
                     self.angle = 0.6
-                elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                elif self.distance_to_center_hunter < 0:  # turn right, to the opposite direction
                     self.angle = -0.6
 
         elif my_hunter_color == 'blue':
             if self.biggest_centroid_blue is not None:
-                self.distance_to_center = round(self.biggest_centroid_blue[0]) - self.image_center
-                if self.distance_to_center > 0:  # turn left, to the opposite direction
+                self.distance_to_center_hunter = round(self.biggest_centroid_blue[0]) - self.image_center
+                if self.distance_to_center_hunter > 0:  # turn left, to the opposite direction
                     self.angle = 0.6
-                elif self.distance_to_center < 0:  # turn right, to the opposite direction
+                elif self.distance_to_center_hunter < 0:  # turn right, to the opposite direction
                     self.angle = -0.6
 
         self.speed = maximum_speed

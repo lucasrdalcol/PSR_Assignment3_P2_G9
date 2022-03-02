@@ -11,6 +11,9 @@ Panels:
         - /TF1
         - /Map1
         - /Pose1
+        - /MarkerArray1
+        - /Marker1
+        - /MarkerArray2
       Splitter Ratio: 0.5235294103622437
     Tree Height: 514
   - Class: rviz/Selection
@@ -169,6 +172,54 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        blue1/base_footprint:
+          Value: true
+        blue1/base_link:
+          Value: true
+        blue1/base_scan:
+          Value: true
+        blue1/camera_link:
+          Value: true
+        blue1/camera_rgb_frame:
+          Value: true
+        blue1/camera_rgb_optical_frame:
+          Value: true
+        blue1/caster_back_left_link:
+          Value: true
+        blue1/caster_back_right_link:
+          Value: true
+        blue1/imu_link:
+          Value: true
+        blue1/odom:
+          Value: true
+        blue1/wheel_left_link:
+          Value: true
+        blue1/wheel_right_link:
+          Value: true
+        green1/base_footprint:
+          Value: true
+        green1/base_link:
+          Value: true
+        green1/base_scan:
+          Value: true
+        green1/camera_link:
+          Value: true
+        green1/camera_rgb_frame:
+          Value: true
+        green1/camera_rgb_optical_frame:
+          Value: true
+        green1/caster_back_left_link:
+          Value: true
+        green1/caster_back_right_link:
+          Value: true
+        green1/imu_link:
+          Value: true
+        green1/odom:
+          Value: true
+        green1/wheel_left_link:
+          Value: true
+        green1/wheel_right_link:
+          Value: true
         red1/base_footprint:
           Value: true
         red1/base_link:
@@ -187,8 +238,6 @@ Visualization Manager:
           Value: true
         red1/imu_link:
           Value: true
-        red1/map:
-          Value: true
         red1/odom:
           Value: true
         red1/wheel_left_link:
@@ -202,7 +251,6 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        red1/map:
           red1/odom:
             red1/base_footprint:
               red1/base_link:
@@ -249,6 +297,30 @@ Visualization Manager:
       Shape: Arrow
       Topic: /move_base_simple/goal
       Unreliable: false
+      Value: true
+      - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /red1/marker_array_spheres
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 1
+      Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /red1/text_marker
+      Name: Marker
+      Namespaces:
+        red1: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /red1/marker_array_cubes
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
