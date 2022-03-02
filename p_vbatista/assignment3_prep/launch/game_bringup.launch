@@ -1,84 +1,120 @@
 <launch>
-
+    <!--    Load game parameters from a yaml file -->
     <rosparam command="load" file="$(find assignment3_prep)/param/game.yaml"/>
 
-<!-- Red Team -->
-    <include file="$(find p_vbatista_bringup)/launch/bringup.launch">
-        <arg name="player_name" value="red1"/>
-        <arg name="player_color" value="Red"/>
-        <arg name="x_pos" value="-1"/>
-        <arg name="y_pos" value="5"/>
-        <arg name="z_pos" value="0"/>
-        <arg name="driver" value="false"/>
-        <arg name="visualize" value="false"/>
+    <!--    Arguments to call the bringup.launch several times, one for each player-->
+    <!--    RED TEAM-->
+    <!--    red1-->
+    <include file="$(find assignment3_prep)/launch/bringup.launch">
+        <arg name="player_name" default="red1"/>
+        <arg name="player_color" default="Red"/>
+        <arg name="x_pos" default="5.0"/>
+        <arg name="y_pos" default="5.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="visualize" default="true"/>
+        <arg name="driver" default="true"/>
+        <arg name="teleop" default="false"/>
     </include>
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="red2"/> -->
-<!--         <arg name="player_color" value="Red"/> -->
-<!--         <arg name="x_pos" value="1"/> -->
-<!--         <arg name="y_pos" value="5"/> -->
-<!--         <arg name="z_pos" value="0"/> -->
+<!--      --><!--    red2--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="red2"/> -->
+<!--         <arg name="player_color" default="Red"/> -->
+<!--         <arg name="x_pos" default="6.0"/> -->
+<!--         <arg name="y_pos" default="5.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="true"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="red3"/> -->
-<!--         <arg name="player_color" value="Red"/> -->
-<!--         <arg name="x_pos" value="0"/> -->
-<!--         <arg name="y_pos" value="5"/> -->
-<!--         <arg name="z_pos" value="0"/> -->
+<!--      --><!--    red3--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="red3"/> -->
+<!--         <arg name="player_color" default="Red"/> -->
+<!--         <arg name="x_pos" default="7.0"/> -->
+<!--         <arg name="y_pos" default="5.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="true"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-<!-- Green Team -->
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="green1"/> -->
-<!--         <arg name="player_color" value="Green"/> -->
-<!--         <arg name="x_pos" default="-1"/> -->
-<!--         <arg name="y_pos" default="6"/> -->
-<!--         <arg name="z_pos" default="0"/> -->
+
+<!--      --><!--    GREEN TEAM--> -->
+<!--      --><!--    green1--> -->
+<!--     <include file="$(find assignment3_prep)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="green1"/> -->
+<!--         <arg name="player_color" default="Green"/> -->
+<!--         <arg name="x_pos" default="-5.0"/> -->
+<!--         <arg name="y_pos" default="5.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="false"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="green2"/> -->
-<!--         <arg name="player_color" value="Green"/> -->
-<!--         <arg name="x_pos" default="1"/> -->
-<!--         <arg name="y_pos" default="6"/> -->
-<!--         <arg name="z_pos" default="0"/> -->
+<!--      --><!--    green2--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="green2"/> -->
+<!--         <arg name="player_color" default="Green"/> -->
+<!--         <arg name="x_pos" default="-6.0"/> -->
+<!--         <arg name="y_pos" default="5.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="true"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="green3"/> -->
-<!--         <arg name="player_color" value="Green"/> -->
-<!--         <arg name="x_pos" default="0"/> -->
-<!--         <arg name="y_pos" default="6"/> -->
-<!--         <arg name="z_pos" default="0"/> -->
+<!--      --><!--    green3--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="green3"/> -->
+<!--         <arg name="player_color" default="Green"/> -->
+<!--         <arg name="x_pos" default="-7.0"/> -->
+<!--         <arg name="y_pos" default="5.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="true"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-<!-- Blue Team -->
-    <include file="$(find p_vbatista_bringup)/launch/bringup.launch">
-        <arg name="player_name" value="blue1"/>
-        <arg name="player_color" value="Blue"/>
-        <arg name="x_pos" default="-1"/>
-        <arg name="y_pos" default="4"/>
-        <arg name="z_pos" default="0"/>
-    </include>
-
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="blue2"/> -->
-<!--         <arg name="player_color" value="Blue"/> -->
-<!--         <arg name="x_pos" default="1"/> -->
-<!--         <arg name="y_pos" default="4"/> -->
-<!--         <arg name="z_pos" default="0"/> -->
+<!--      --><!--    BLUE TEAM--> -->
+<!--      --><!--    blue1--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="blue1"/> -->
+<!--         <arg name="player_color" default="Blue"/> -->
+<!--         <arg name="x_pos" default="0.0"/> -->
+<!--         <arg name="y_pos" default="-1.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="false"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-<!--     <include file="$(find p_vbatista_bringup)/launch/bringup.launch"> -->
-<!--         <arg name="player_name" value="blue3"/> -->
-<!--         <arg name="player_color" value="Blue"/> -->
-<!--         <arg name="x_pos" default="0"/> -->
-<!--         <arg name="y_pos" default="4"/> -->
-<!--         <arg name="z_pos" default="0"/> -->
+<!--      --><!--    blue2--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="blue2"/> -->
+<!--         <arg name="player_color" default="Blue"/> -->
+<!--         <arg name="x_pos" default="1.0"/> -->
+<!--         <arg name="y_pos" default="-1.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="true"/> -->
+<!--         <arg name="teleop" default="false"/> -->
 <!--     </include> -->
 
-    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>
+<!--      --><!--    blue3--> -->
+<!--     <include file="$(find p_ldalcol_bringup)/launch/bringup.launch"> -->
+<!--         <arg name="player_name" default="blue3"/> -->
+<!--         <arg name="player_color" default="Blue"/> -->
+<!--         <arg name="x_pos" default="-1.0"/> -->
+<!--         <arg name="y_pos" default="-1.0"/> -->
+<!--         <arg name="z_pos" default="0.0"/> -->
+<!--         <arg name="visualize" default="false"/> -->
+<!--         <arg name="driver" default="true"/> -->
+<!--         <arg name="teleop" default="false"/> -->
+<!--     </include> -->
+
+<!--    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>-->
 
 </launch>

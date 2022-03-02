@@ -164,7 +164,7 @@
             <camera>
                 <horizontal_fov>1.085595</horizontal_fov>
                 <image>
-                    <width>900</width>
+                    <width>854</width>
                     <height>480</height>
                     <format>R8G8B8</format>
                 </image>
@@ -199,7 +199,7 @@
             <camera>
                 <horizontal_fov>1.085595</horizontal_fov>
                 <image>
-                    <width>900</width>
+                    <width>854</width>
                     <height>480</height>
                     <format>R8G8B8</format>
                 </image>

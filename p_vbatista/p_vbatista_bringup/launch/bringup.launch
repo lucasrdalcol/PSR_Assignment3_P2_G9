@@ -14,6 +14,8 @@
     <arg name="y_pos" default="-2.0"/>
     <arg name="z_pos" default="0.0"/>
 
+    <rosparam command="load" file="$(find assignment3_prep)/param/game.yaml"/>
+
     <group ns="$(arg player_name)">
         <param name="tf_prefix" value="$(arg player_name)"/>
         <param name="robot_description" command="$(find xacro)/xacro --inorder $(find p_vbatista_description)/urdf/p_vbatista.urdf.xacro player_name:=$(arg player_name) player_color:=$(arg player_color)"/>
@@ -27,7 +29,9 @@
         </include>
 
         <group if="$(arg visualize)">
-            <include file="$(find p_vbatista_bringup)/launch/visualize.launch"/>
+            <include file="$(find p_vbatista_bringup)/launch/visualize.launch">
+            <arg name="player_name" value="$(arg player_name)"/>
+            </include>
         </group>
     </group>
 
@@ -38,7 +42,7 @@
     </group>
 
     <group if="$(arg driver)">
-        <node name="$(arg player_name)" pkg="p_vbatista_player" type="driver.py" output="screen"/>
+        <node name="$(arg player_name)" pkg="p_vbatista_player" type="driver2.py" output="screen"/>
     </group>
 
     <group if="$(arg slam)">

@@ -15,6 +15,7 @@ from colorama import Fore, Style
 from cv_bridge import CvBridge, CvBridgeError
 from gazebo_msgs.msg import ContactsState
 from std_msgs.msg import String
+from psr_parte09_exs.msg import Dog
 from geometry_msgs.msg import Twist, Point
 from tf2_geometry_msgs import PoseStamped
 from sensor_msgs.msg import Image, LaserScan
