@@ -320,28 +320,32 @@ class Driver:
             elif self.camera_state == 'waiting':
                 if self.biggest_centroid_blue2 is not None:
                     self.camera_state = 'escaping'
-                elif self.biggest_centroid_red2 is not None:
+                elif self.biggest_centroid_green2 is not None:
                     self.camera_state = 'turn_to_hunt'
 
-        # elif self.name in self.teams['green_team']:
-        #     if self.camera_state == 'hunting':
-        #         if self.biggest_centroid_red2 is not None and self.biggest_centroid_blue is not None:
-        #             if self.biggest_area_red2 > self.biggest_area_blue:
-        #                 self.camera_state = 'escaping'
-        #
-        #     elif self.camera_state == 'waiting':
-        #         if self.biggest_centroid_red2 is not None:
-        #             self.camera_state = 'escaping'
-        #
-        # elif self.name in self.teams['blue_team']:
-        #     if self.camera_state == 'hunting':
-        #         if self.biggest_centroid_green2 is not None and self.biggest_centroid_red is not None:
-        #             if self.biggest_area_green2 > self.biggest_area_red:
-        #                 self.camera_state = 'escaping'
-        #
-        #     elif self.camera_state == 'waiting':
-        #         if self.biggest_centroid_green2 is not None:
-        #             self.camera_state = 'escaping'
+        elif self.name in self.teams['green_team']:
+            if self.camera_state == 'hunting':
+                if self.biggest_centroid_red2 is not None and self.biggest_centroid_blue is not None:
+                    if self.biggest_area_red2 > self.biggest_area_blue:
+                        self.camera_state = 'escaping'
+
+            elif self.camera_state == 'waiting':
+                if self.biggest_centroid_red2 is not None:
+                    self.camera_state = 'escaping'
+                elif self.biggest_centroid_blue2 is not None:
+                    self.camera_state = 'turn_to_hunt'
+
+        elif self.name in self.teams['blue_team']:
+            if self.camera_state == 'hunting':
+                if self.biggest_centroid_green2 is not None and self.biggest_centroid_red is not None:
+                    if self.biggest_area_green2 > self.biggest_area_red:
+                        self.camera_state = 'escaping'
+
+            elif self.camera_state == 'waiting':
+                if self.biggest_centroid_green2 is not None:
+                    self.camera_state = 'escaping'
+                elif self.biggest_centroid_red2 is not None:
+                    self.camera_state = 'turn_to_hunt'
 
         # Annotate the closest players of my_team, my_preys and my_hunters
         if self.debug is True:
@@ -755,10 +759,10 @@ class Driver:
 
                         if self.distance_to_center_prey2 >= 0:
                             self.speed = 0.0
-                            self.angle = 2.0
+                            self.angle = 1.5
                         else:
                             self.speed = 0.0
-                            self.angle = -2.0
+                            self.angle = -1.5
 
                         self.current_state = 'turn_to_hunt'
                         if self.debug:
@@ -777,6 +781,9 @@ class Driver:
         # Publish the current state text marker
         text_marker = self.createTextMarker(self.current_state)
         self.publisher_text_marker.publish(text_marker)
+
+        if self.camera_state == 'turn_to_hunt':
+            rospy.sleep(2)
 
     def driveStraight(self, minimum_speed=0.1, maximum_speed=0.3):
         """
