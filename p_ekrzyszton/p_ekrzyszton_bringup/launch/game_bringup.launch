@@ -14,6 +14,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    red2-->
@@ -26,6 +27,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    red3-->
@@ -38,6 +40,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
 
@@ -52,6 +55,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    green2-->
@@ -64,6 +68,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    green3-->
@@ -76,6 +81,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    BLUE TEAM-->
@@ -89,6 +95,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    blue2-->
@@ -101,6 +108,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
     <!--    blue3-->
@@ -113,6 +121,7 @@
         <arg name="visualize" default="false"/>
         <arg name="driver" default="true"/>
         <arg name="teleop" default="false"/>
+        <arg name="debug" default="false"/>
     </include>
 
 <!--    <node name="set_player_names" pkg="th_referee" type="set_player_names" output="screen"/>-->

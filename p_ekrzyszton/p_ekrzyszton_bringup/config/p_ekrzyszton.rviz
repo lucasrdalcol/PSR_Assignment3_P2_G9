@@ -92,7 +92,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05000000074505806
       Style: Spheres
-      Topic: /p_ekrzysztonscan
+      Topic: /p_ekrzyszton/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true

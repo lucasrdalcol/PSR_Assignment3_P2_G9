@@ -9,4 +9,3 @@ positive_score: 1
 negative_score: -1
 best_hunter_score: 5
 best_survivor_score: 5
-debug: False

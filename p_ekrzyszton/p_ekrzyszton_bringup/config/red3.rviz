@@ -10,6 +10,9 @@ Panels:
         - /RobotModel1
         - /TF1
         - /Pose1
+        - /MarkerArray1
+        - /Marker1
+        - /Marker2
       Splitter Ratio: 0.5235294103622437
     Tree Height: 514
   - Class: rviz/Selection
@@ -168,198 +171,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        blue1/base_footprint:
-          Value: true
-        blue1/base_link:
-          Value: true
-        blue1/base_scan:
-          Value: true
-        blue1/camera_link:
-          Value: true
-        blue1/camera_rgb_frame:
-          Value: true
-        blue1/camera_rgb_optical_frame:
-          Value: true
-        blue1/caster_back_left_link:
-          Value: true
-        blue1/caster_back_right_link:
-          Value: true
-        blue1/imu_link:
-          Value: true
-        blue1/odom:
-          Value: true
-        blue1/wheel_left_link:
-          Value: true
-        blue1/wheel_right_link:
-          Value: true
-        blue2/base_footprint:
-          Value: true
-        blue2/base_link:
-          Value: true
-        blue2/base_scan:
-          Value: true
-        blue2/camera_link:
-          Value: true
-        blue2/camera_rgb_frame:
-          Value: true
-        blue2/camera_rgb_optical_frame:
-          Value: true
-        blue2/caster_back_left_link:
-          Value: true
-        blue2/caster_back_right_link:
-          Value: true
-        blue2/imu_link:
-          Value: true
-        blue2/odom:
-          Value: true
-        blue2/wheel_left_link:
-          Value: true
-        blue2/wheel_right_link:
-          Value: true
-        blue3/base_footprint:
-          Value: true
-        blue3/base_link:
-          Value: true
-        blue3/base_scan:
-          Value: true
-        blue3/camera_link:
-          Value: true
-        blue3/camera_rgb_frame:
-          Value: true
-        blue3/camera_rgb_optical_frame:
-          Value: true
-        blue3/caster_back_left_link:
-          Value: true
-        blue3/caster_back_right_link:
-          Value: true
-        blue3/imu_link:
-          Value: true
-        blue3/odom:
-          Value: true
-        blue3/wheel_left_link:
-          Value: true
-        blue3/wheel_right_link:
-          Value: true
-        green1/base_footprint:
-          Value: true
-        green1/base_link:
-          Value: true
-        green1/base_scan:
-          Value: true
-        green1/camera_link:
-          Value: true
-        green1/camera_rgb_frame:
-          Value: true
-        green1/camera_rgb_optical_frame:
-          Value: true
-        green1/caster_back_left_link:
-          Value: true
-        green1/caster_back_right_link:
-          Value: true
-        green1/imu_link:
-          Value: true
-        green1/odom:
-          Value: true
-        green1/wheel_left_link:
-          Value: true
-        green1/wheel_right_link:
-          Value: true
-        green2/base_footprint:
-          Value: true
-        green2/base_link:
-          Value: true
-        green2/base_scan:
-          Value: true
-        green2/camera_link:
-          Value: true
-        green2/camera_rgb_frame:
-          Value: true
-        green2/camera_rgb_optical_frame:
-          Value: true
-        green2/caster_back_left_link:
-          Value: true
-        green2/caster_back_right_link:
-          Value: true
-        green2/imu_link:
-          Value: true
-        green2/odom:
-          Value: true
-        green2/wheel_left_link:
-          Value: true
-        green2/wheel_right_link:
-          Value: true
-        green3/base_footprint:
-          Value: true
-        green3/base_link:
-          Value: true
-        green3/base_scan:
-          Value: true
-        green3/camera_link:
-          Value: true
-        green3/camera_rgb_frame:
-          Value: true
-        green3/camera_rgb_optical_frame:
-          Value: true
-        green3/caster_back_left_link:
-          Value: true
-        green3/caster_back_right_link:
-          Value: true
-        green3/imu_link:
-          Value: true
-        green3/odom:
-          Value: true
-        green3/wheel_left_link:
-          Value: true
-        green3/wheel_right_link:
-          Value: true
-        red1/base_footprint:
-          Value: true
-        red1/base_link:
-          Value: true
-        red1/base_scan:
-          Value: true
-        red1/camera_link:
-          Value: true
-        red1/camera_rgb_frame:
-          Value: true
-        red1/camera_rgb_optical_frame:
-          Value: true
-        red1/caster_back_left_link:
-          Value: true
-        red1/caster_back_right_link:
-          Value: true
-        red1/imu_link:
-          Value: true
-        red1/odom:
-          Value: true
-        red1/wheel_left_link:
-          Value: true
-        red1/wheel_right_link:
-          Value: true
-        red2/base_footprint:
-          Value: true
-        red2/base_link:
-          Value: true
-        red2/base_scan:
-          Value: true
-        red2/camera_link:
-          Value: true
-        red2/camera_rgb_frame:
-          Value: true
-        red2/camera_rgb_optical_frame:
-          Value: true
-        red2/caster_back_left_link:
-          Value: true
-        red2/caster_back_right_link:
-          Value: true
-        red2/imu_link:
-          Value: true
-        red2/odom:
-          Value: true
-        red2/wheel_left_link:
-          Value: true
-        red2/wheel_right_link:
-          Value: true
         red3/base_footprint:
           Value: true
         red3/base_link:
@@ -391,44 +202,6 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        red1/odom:
-          red1/base_footprint:
-            red1/base_link:
-              red1/base_scan:
-                {}
-              red1/camera_link:
-                red1/camera_rgb_frame:
-                  red1/camera_rgb_optical_frame:
-                    {}
-              red1/caster_back_left_link:
-                {}
-              red1/caster_back_right_link:
-                {}
-              red1/imu_link:
-                {}
-              red1/wheel_left_link:
-                {}
-              red1/wheel_right_link:
-                {}
-        red2/odom:
-          red2/base_footprint:
-            red2/base_link:
-              red2/base_scan:
-                {}
-              red2/camera_link:
-                red2/camera_rgb_frame:
-                  red2/camera_rgb_optical_frame:
-                    {}
-              red2/caster_back_left_link:
-                {}
-              red2/caster_back_right_link:
-                {}
-              red2/imu_link:
-                {}
-              red2/wheel_left_link:
-                {}
-              red2/wheel_right_link:
-                {}
         red3/odom:
           red3/base_footprint:
             red3/base_link:
@@ -475,6 +248,30 @@ Visualization Manager:
       Shape: Arrow
       Topic: /move_base_simple/goal
       Unreliable: false
+      Value: true
+      - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /red3/marker_array
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /red3/text_marker
+      Name: Marker
+      Namespaces:
+        red3: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /red3/cube_marker
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
