@@ -55,7 +55,7 @@ rosrun th_referee th_referee
 ### Driver Intelligences
 We developed two intelligences to drive the robots: one of them for a robot with one camera and the other with two cameras.
 
-The images captured by the cameras is converted to cv2 using the bridge.imgmsg_to_cv2 function, and then the centroid of the biggest patches of red, green and blue are found. This information, along with the LaserScan message, is used to determine the robot's mode of operation.
+The images captured by the cameras is converted to cv2 using the bridge.imgmsg_to_cv2 function, and then the centroid of the biggest patches of red, green and blue in the image are found. This information, along with the LaserScan message, is used to determine the robot's mode of operation.
 
 If, for example, a red robot sees a green blob, then it enters its 'hunting' mode (and it enters its 'escaping' mode if it sees a blue blob). If it sees both, it compares to see which of the two blobs has the biggest area (which means it's closer). So the robot prioritizes escaping over hunting if its hunter is closer than its prey. In case it doesn't detect another robot using the camera, the robot enters its 'waiting' state.
 
@@ -71,7 +71,7 @@ The 'escaping' state does the same, except it turns the robot in the opposite di
 
 In the 'waiting' state, the robot walks in a straight line until he finds either a prey, a hunter or a wall.
 
-However, if the robot recieves a goal, the function goalRecievedCallback() recieves a goal pose and transforms it to the odom frame, while the driveStraight() function takes this goal in the odom frame, copies it and transforms the copy to the base_footprint frame. It then enters the 'goal_active' state. When it does, it ignores the other robots (while still avoiding the walls), calculates the angle to turn to in order to reach the goal and attempts to drive straight toward it, avoiding the walls. It stops at a small distance of the goal, to avoid having the robot circling the goal continuously.
+However, if the robot recieves a goal, the function goalRecievedCallback() recieves a goal pose and transforms it to the odom frame, while the driveStraight() function takes this goal in the odom frame, copies it and transforms the copy to the base_footprint frame. It then enters the 'goal_active' state. When it does, it ignores the other robots (while still avoiding the walls), and drives towards the goal. It stops at a small distance of the goal, to avoid having the robot circling the goal continuously.
 
 
 
