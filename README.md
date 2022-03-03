@@ -68,7 +68,7 @@ The 'escaping' state does the same, except it turns the robot in the opposite di
 
 In the 'waiting' state, the robot walks in a straight line until he finds either a prey, a hunter or a wall.
 
-However, if the robot recieves a goal, the function goalRecievedCallback() recieves a goal pose and transforms it to the odom frame, while the driveStraight() function takes the this goal in the odom frame, copies it and transforms the copy to the base_footprint frame. It then enters the 'goal_active' state. When it does, it ignores the other robots (while still avoiding the walls), calculates the angle to turn to in order to reach the goal and attempts to drive straight toward it, avoiding the walls. It stops at a small distance of the goal, to avoid having the robot circling the goal continuously.
+However, if the robot recieves a goal, the function goalRecievedCallback() recieves a goal pose and transforms it to the odom frame, while the driveStraight() function takes this goal in the odom frame, copies it and transforms the copy to the base_footprint frame. It then enters the 'goal_active' state. When it does, it ignores the other robots (while still avoiding the walls), calculates the angle to turn to in order to reach the goal and attempts to drive straight toward it, avoiding the walls. It stops at a small distance of the goal, to avoid having the robot circling the goal continuously.
 
 
 
