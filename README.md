@@ -10,7 +10,7 @@ A player who has been hunted by the hunting team in the form of contact / collis
 The character of the referee was also implemented in the game. When a player has been hunted, he goes to a special zone for 6 seconds, then after serving a penalty, the hunted robot (player) returns to the arena to a random place.
 The team with the most points wins.
 
-## Program functionalities Overview
+## Program Functionalities Overview
 
 ### Gameplay arena & simulation video
 In our project, three arenas have been implemented in which the game is possible.
@@ -25,24 +25,21 @@ In the project it is possible to navigate the robot in three arenas mentioned ab
 - Navigation **th_arena_1.world** [[Watch the video. Click here!]](https://youtu.be/4-fUDnn4Wi0)
 - Navigation **th_arena_2.world** [[Watch the video. Click here!]](https://youtu.be/C__kIk-h4oo)
 - Navigation **th_arena_3.world** [[Watch the video. Click here!]](https://youtu.be/HP5tDa2EemE)
-## Usage of program
 
 ### Running the program [instructions]
 Open a new terminal and enter the following command to run empty environment:
 ```
 roslaunch p_playerName_bringup gazebo.launch
 ```
-In new terminal type following command to add a specific single player:
+In new terminal type following command to add a single robot, with a certain color (Red, Green or Blue):
 ```
 roslaunch p_playerName_bringup bringup.launch player_name:=red1 player_color:=Red
 ```
-To automatically add multiple players, enter the following command in the terminal:
+In order to visualize the robot using RViz, add visualize:=true; to use an AI in order to drive the robot, add driver:=true; finally, in order to control the robot remotely via keyboard, add teleop:=true.
+
+To automatically add three players for each team, enter the following command in the terminal:
 ```
 roslaunch p_playerName_bringup game_bringup.launch 
-```
-In order to see the arena on which you have added players type following command in terminal:
-```
-roslaunch p_playerName_bringup bringup.launch visualize:=true driver:=true 
 ```
 To start the game, enter the following command in the terminal:
 ```
