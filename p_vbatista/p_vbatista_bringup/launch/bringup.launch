@@ -14,7 +14,7 @@
     <arg name="y_pos" default="-2.0"/>
     <arg name="z_pos" default="0.0"/>
 
-    <rosparam command="load" file="$(find assignment3_prep)/param/game.yaml"/>
+<!--    <rosparam command="load" file="$(find assignment3_prep)/param/game.yaml"/>-->
 
     <group ns="$(arg player_name)">
         <param name="tf_prefix" value="$(arg player_name)"/>

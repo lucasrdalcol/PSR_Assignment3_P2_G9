@@ -46,7 +46,7 @@ class Driver:
         self.angle = 0
         self.speed = 0
         self.image_center = 427
-        self.debug = rospy.get_param('/debug')
+        self.debug = rospy.get_param('/' + self.name + '/debug')
         self.ranges_red = {'b': {'min': 0, 'max': 50},
                            'g': {'min': 0, 'max': 50},
                            'r': {'min': 100, 'max': 256}}
