@@ -12,13 +12,19 @@ The team with the most points wins.
 
 ## Program functionalities Overview
 
-### Gameplay arena
-In our project, three arenas have been implemented in which the game is possible:
-- th_arena_1.world
-- th_arena_2.world
-- th_arena_3.world
+### Gameplay arena & simulation video
+In our project, three arenas have been implemented in which the game is possible.
+<br /> The videos uploaded to the YouTube platform shows a simulation of the game in the three arenas. Nevertheless, it is advisable to see a practical simulation of the gameplay recorded in each arena (see links below):
+- **th_arena_1.world** [[Watch the video. Click here!]](https://youtu.be/dVea0v-LO34)
+- **th_arena_2.world** [[Watch the video. Click here!]](https://youtu.be/9nZphKANAS4)
+- **th_arena_3.world** [[Watch the video. Click here!]](https://youtu.be/d_NqNGz0aFM)
+  
+### Navigation on arenas
 
-
+In the project it is possible to navigate the robot in three arenas mentioned above, and in order to illustrate the process of navigation, videos have been recorded to show how the robot moves according to the direction indicated:
+- Navigation **th_arena_1.world** [[Watch the video. Click here!]](https://youtu.be/4-fUDnn4Wi0)
+- Navigation **th_arena_2.world** [[Watch the video. Click here!]](https://youtu.be/C__kIk-h4oo)
+- Navigation **th_arena_3.world** [[Watch the video. Click here!]](https://youtu.be/HP5tDa2EemE)
 ## Usage of program
 
 ### Running the program [instructions]
