@@ -18,6 +18,8 @@ In our project, three arenas have been implemented in which the game is possible
 - **th_arena_1.world** [[Watch the video. Click here!]](https://youtu.be/dVea0v-LO34)
 - **th_arena_2.world** [[Watch the video. Click here!]](https://youtu.be/9nZphKANAS4)
 - **th_arena_3.world** [[Watch the video. Click here!]](https://youtu.be/d_NqNGz0aFM)
+
+Note: Due to high processing power demand, these videos tend to be long. It is recommended to watch them at a higher playback speed.
   
 ### Navigation on arenas
 
@@ -25,6 +27,10 @@ In the project it is possible to navigate the robot in three arenas mentioned ab
 - Navigation **th_arena_1.world** [[Watch the video. Click here!]](https://youtu.be/4-fUDnn4Wi0)
 - Navigation **th_arena_2.world** [[Watch the video. Click here!]](https://youtu.be/C__kIk-h4oo)
 - Navigation **th_arena_3.world** [[Watch the video. Click here!]](https://youtu.be/HP5tDa2EemE)
+
+## Robot Teleop
+It is also possible to control the a robot remotely, as shown in the following video. In this case, the mobile app ROS CONTROL was used. It is, however, also possible to control the robot using the keyboard.
+- Remote control using a mobile app [[Watch the video. Click here!]](https://youtu.be/WuJwsUXJszk)
 
 ### Running the program [instructions]
 Open a new terminal and enter the following command to run empty environment:
